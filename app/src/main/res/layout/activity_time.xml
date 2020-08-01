@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     android:keepScreenOn="true"
-    tools:context=".MainActivity">
+    tools:context=".TimeActivity">
 
     <TextView
         android:id="@+id/endTime"
@@ -89,6 +89,7 @@
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
         android:layout_marginBottom="32dp"
+        android:onClick="goToSettingsActivity"
         android:text="NEXT"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"

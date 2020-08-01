@@ -18,7 +18,10 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".TimeActivity" />
+        <activity android:name=".TimeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
