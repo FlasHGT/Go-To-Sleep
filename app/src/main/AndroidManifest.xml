@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
+        <activity android:name=".TimeActivity"></activity>
 
         <service
             android:name=".CheckTime"
@@ -21,7 +22,7 @@
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".TimeActivity" />
-        <activity android:name=".TimeActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
