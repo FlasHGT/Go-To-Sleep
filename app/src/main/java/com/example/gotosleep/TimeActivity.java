@@ -1,9 +1,12 @@
 package com.example.gotosleep;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -18,6 +21,7 @@ public class TimeActivity extends AppCompatActivity {
     private MainActivity mainActivity = new MainActivity();
     private TextView startTime, endTime;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +40,6 @@ public class TimeActivity extends AppCompatActivity {
                             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                                 mainActivity.t1Hour = hour;
                                 mainActivity.t1Minute = minute;
-
-                                if (hour < 12) {
-                                    mainActivity.am_PM1 = "AM";
-                                }else {
-                                    mainActivity.am_PM1 = "PM";
-                                }
 
                                 Calendar calendar = Calendar.getInstance();
 
@@ -71,12 +69,6 @@ public class TimeActivity extends AppCompatActivity {
                                 mainActivity.t2Hour = hour;
                                 mainActivity.t2Minute = minute;
 
-                                if (hour < 12) {
-                                    mainActivity.am_PM2 = "AM";
-                                }else {
-                                    mainActivity.am_PM2 = "PM";
-                                }
-
                                 Calendar calendar = Calendar.getInstance();
 
                                 calendar.set(0, 0, 0, mainActivity.t2Hour, mainActivity.t2Minute);
@@ -92,15 +84,49 @@ public class TimeActivity extends AppCompatActivity {
                 timePickerDialog.show();
             }
         });
+
+        loadData();
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void loadData () {
+        SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
+
+        mainActivity.t1Hour = sharedPreferences.getInt(mainActivity.T1HOUR, 0);
+        mainActivity.t1Minute = sharedPreferences.getInt(mainActivity.T1MINUTE, 0);
+        mainActivity.t2Hour = sharedPreferences.getInt(mainActivity.T2HOUR, 6);
+        mainActivity.t2Minute = sharedPreferences.getInt(mainActivity.T2MINUTE, 0);
+
+        startTime.setText(mainActivity.formatTimeString(mainActivity.t1Hour, mainActivity.t1Minute));
+        endTime.setText(mainActivity.formatTimeString(mainActivity.t2Hour, mainActivity.t2Minute));
+    }
+
+    public void saveData () {
+        SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putInt(mainActivity.T1HOUR, mainActivity.t1Hour);
+        editor.putInt(mainActivity.T1MINUTE, mainActivity.t1Minute);
+        editor.putInt(mainActivity.T2HOUR, mainActivity.t2Hour);
+        editor.putInt(mainActivity.T2MINUTE, mainActivity.t2Minute);
+
+        editor.apply();
     }
 
 
-
     public void goToSettingsActivity (View view) {
-        mainActivity.saveData();
+        saveData();
 
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        saveData();
     }
 
 }

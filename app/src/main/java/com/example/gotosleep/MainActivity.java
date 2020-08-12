@@ -24,12 +24,8 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     public int t1Hour, t1Minute, t2Hour, t2Minute;
-    public String am_PM1, am_PM2;
 
     public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String AM_PM1 = "amPM1";
-    public static final String AM_PM2 = "amPM2";
-    public static final String FIRSTTIME = "firstTime";
     public static final String T1HOUR = "t1Hour";
     public static final String T1MINUTE = "t1Minute";
     public static final String T2HOUR = "t2Hour";
@@ -40,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Switch vibrate, muteSound;
     private TextView startTime, endTime;
-
-    private static boolean firstTime = true;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -64,12 +58,6 @@ public class MainActivity extends AppCompatActivity {
                             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                                 t1Hour = hour;
                                 t1Minute = minute;
-
-                                if (hour < 12) {
-                                    am_PM1 = "AM";
-                                }else {
-                                    am_PM1 = "PM";
-                                }
 
                                 Calendar calendar = Calendar.getInstance();
 
@@ -95,12 +83,6 @@ public class MainActivity extends AppCompatActivity {
                             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                                 t2Hour = hour;
                                 t2Minute = minute;
-
-                                if (hour < 12) {
-                                    am_PM2 = "AM";
-                                }else {
-                                    am_PM2 = "PM";
-                                }
 
                                 Calendar calendar = Calendar.getInstance();
 
@@ -144,25 +126,20 @@ public class MainActivity extends AppCompatActivity {
     public void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 
-        if (firstTime) {
-            sharedPreferences.edit().clear().apply();
-            firstTime = false;
-        }else {
-            t1Hour = sharedPreferences.getInt(T1HOUR, 0);
-            t1Minute = sharedPreferences.getInt(T1MINUTE, 0);
-            t2Hour = sharedPreferences.getInt(T2HOUR, 0);
-            t2Minute = sharedPreferences.getInt(T2MINUTE, 0);
+        t1Hour = sharedPreferences.getInt(T1HOUR, 0);
+        t1Minute = sharedPreferences.getInt(T1MINUTE, 0);
+        t2Hour = sharedPreferences.getInt(T2HOUR, 0);
+        t2Minute = sharedPreferences.getInt(T2MINUTE, 0);
 
-            startTime.setText(formatTimeString(t1Hour, t1Minute));
-            endTime.setText(formatTimeString(t2Hour, t2Minute));
+        startTime.setText(formatTimeString(t1Hour, t1Minute));
+        endTime.setText(formatTimeString(t2Hour, t2Minute));
 
-            vibrate.setChecked(sharedPreferences.getBoolean(VIBRATE_SWTICH, false));
-            muteSound.setChecked(sharedPreferences.getBoolean(MUTE_SOUND_SWITCH, false));
-        }
+        vibrate.setChecked(sharedPreferences.getBoolean(VIBRATE_SWTICH, false));
+        muteSound.setChecked(sharedPreferences.getBoolean(MUTE_SOUND_SWITCH, false));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private String formatTimeString (int hour, int minute) {
+    public String formatTimeString (int hour, int minute) {
         String output = "";
 
         if (hour < 10) {
@@ -180,5 +157,12 @@ public class MainActivity extends AppCompatActivity {
         output = LocalTime.parse(output).format(DateTimeFormatter.ofPattern("hh:mm a"));
 
         return output;
+    }
+
+    public void goToSettingsActivity (View view) {
+        saveData();
+
+        Intent intent = new Intent(this, TimeActivity.class);
+        startActivity(intent);
     }
 }
