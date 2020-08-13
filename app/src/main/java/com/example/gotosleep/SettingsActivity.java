@@ -24,8 +24,6 @@ public class SettingsActivity extends AppCompatActivity {
         vibrate = findViewById(R.id.vibrateSwitch);
         muteSound = findViewById(R.id.muteSoundSwitch);
 
-        Intent intent = getIntent();
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -55,8 +53,10 @@ public class SettingsActivity extends AppCompatActivity {
     public void goToMainActivity (View view) {
         saveData();
 
+        mainActivity.firstTime = false;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finishAffinity();
     }
 
     @Override

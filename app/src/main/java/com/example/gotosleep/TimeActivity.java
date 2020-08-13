@@ -25,68 +25,93 @@ public class TimeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_time);
 
-        startTime = findViewById(R.id.startTime);
-        endTime = findViewById(R.id.endTime);
+        if (mainActivity.firstTime) {
+            setContentView(R.layout.activity_time);
 
-        startTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(
-                        TimeActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                                mainActivity.t1Hour = hour;
-                                mainActivity.t1Minute = minute;
+            startTime = findViewById(R.id.startTime);
+            endTime = findViewById(R.id.endTime);
 
-                                Calendar calendar = Calendar.getInstance();
+            startTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(
+                            TimeActivity.this,
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                                    mainActivity.t1Hour = hour;
+                                    mainActivity.t1Minute = minute;
 
-                                calendar.set(0, 0, 0, mainActivity.t1Hour, mainActivity.t1Minute);
+                                    Calendar calendar = Calendar.getInstance();
 
-                                startTime.setText(DateFormat.format("hh:mm aa", calendar));
+                                    calendar.set(0, 0, 0, mainActivity.t1Hour, mainActivity.t1Minute);
 
-
-                            }
-                        }, 12, 0, false
-                );
+                                    startTime.setText(DateFormat.format("hh:mm aa", calendar));
 
 
-                timePickerDialog.updateTime(mainActivity.t1Hour, mainActivity.t1Minute);
-                timePickerDialog.show();
-            }
-        });
+                                }
+                            }, 12, 0, false
+                    );
 
-        endTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(
-                        TimeActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                                mainActivity.t2Hour = hour;
-                                mainActivity.t2Minute = minute;
 
-                                Calendar calendar = Calendar.getInstance();
+                    timePickerDialog.updateTime(mainActivity.t1Hour, mainActivity.t1Minute);
+                    timePickerDialog.show();
+                }
+            });
 
-                                calendar.set(0, 0, 0, mainActivity.t2Hour, mainActivity.t2Minute);
+            endTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(
+                            TimeActivity.this,
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                                    mainActivity.t2Hour = hour;
+                                    mainActivity.t2Minute = minute;
 
-                                endTime.setText(DateFormat.format("hh:mm aa", calendar));
+                                    Calendar calendar = Calendar.getInstance();
 
-                                Log.d("lol", "" + mainActivity.t2Hour);
-                        }
-                        }, 12, 0, false
-                );
+                                    calendar.set(0, 0, 0, mainActivity.t2Hour, mainActivity.t2Minute);
 
-                timePickerDialog.updateTime(mainActivity.t2Hour, mainActivity.t2Minute);
-                timePickerDialog.show();
-            }
-        });
+                                    endTime.setText(DateFormat.format("hh:mm aa", calendar));
 
-        loadData();
+                                    Log.d("lol", "" + mainActivity.t2Hour);
+                                }
+                            }, 12, 0, false
+                    );
 
+                    timePickerDialog.updateTime(mainActivity.t2Hour, mainActivity.t2Minute);
+                    timePickerDialog.show();
+                }
+            });
+
+            loadData();
+        }else {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        saveData();
+    }
+
+    public void saveData () {
+        SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putInt(mainActivity.T1HOUR, mainActivity.t1Hour);
+        editor.putInt(mainActivity.T1MINUTE, mainActivity.t1Minute);
+        editor.putInt(mainActivity.T2HOUR, mainActivity.t2Hour);
+        editor.putInt(mainActivity.T2MINUTE, mainActivity.t2Minute);
+
+        editor.apply();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -102,32 +127,11 @@ public class TimeActivity extends AppCompatActivity {
         endTime.setText(mainActivity.formatTimeString(mainActivity.t2Hour, mainActivity.t2Minute));
     }
 
-    public void saveData () {
-        SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt(mainActivity.T1HOUR, mainActivity.t1Hour);
-        editor.putInt(mainActivity.T1MINUTE, mainActivity.t1Minute);
-        editor.putInt(mainActivity.T2HOUR, mainActivity.t2Hour);
-        editor.putInt(mainActivity.T2MINUTE, mainActivity.t2Minute);
-
-        editor.apply();
-    }
-
-
     public void goToSettingsActivity (View view) {
         saveData();
 
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        saveData();
-    }
-
 }
 

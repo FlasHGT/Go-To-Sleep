@@ -4,13 +4,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -19,7 +16,6 @@ import android.widget.TimePicker;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,9 +26,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String T1MINUTE = "t1Minute";
     public static final String T2HOUR = "t2Hour";
     public static final String T2MINUTE = "t2Minute";
-
     public static final String VIBRATE_SWTICH = "vibrateSwitch";
     public static final String MUTE_SOUND_SWITCH = "muteSoundSwitch";
+
+    public static boolean firstTime = true;
 
     private Switch vibrate, muteSound;
     private TextView startTime, endTime;
@@ -157,12 +154,5 @@ public class MainActivity extends AppCompatActivity {
         output = LocalTime.parse(output).format(DateTimeFormatter.ofPattern("hh:mm a"));
 
         return output;
-    }
-
-    public void goToSettingsActivity (View view) {
-        saveData();
-
-        Intent intent = new Intent(this, TimeActivity.class);
-        startActivity(intent);
     }
 }
