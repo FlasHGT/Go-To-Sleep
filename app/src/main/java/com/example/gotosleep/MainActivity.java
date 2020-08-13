@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         startTime = findViewById(R.id.startTime);
         endTime = findViewById(R.id.endTime);
-        vibrate = findViewById(R.id.vibrateSwitch);
-        muteSound = findViewById(R.id.muteSoundSwitch);
+        vibrate = findViewById(R.id.muteSoundSwitch);
+        muteSound = findViewById(R.id.vibrateSwitch);
 
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -11,11 +11,11 @@
         layout="@layout/toolbar" />
 
     <Switch
-        android:id="@+id/muteSoundSwitch"
+        android:id="@+id/vibrateSwitch"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:layout_above="@+id/button2"
-        android:layout_below="@+id/vibrateSwitch"
+        android:layout_below="@+id/muteSoundSwitch"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentEnd="true"
@@ -26,13 +26,13 @@
         android:layout_marginEnd="96dp"
         android:layout_marginRight="96dp"
         android:layout_marginBottom="162dp"
-        android:text="MUTE SOUND"
+        android:text="VIBRATION"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold" />
 
     <Switch
-        android:id="@+id/vibrateSwitch"
+        android:id="@+id/muteSoundSwitch"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:layout_below="@+id/textView3"
@@ -45,7 +45,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="96dp"
         android:layout_marginRight="96dp"
-        android:text="VIBRATION"
+        android:text="MUTE SOUND"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold" />
