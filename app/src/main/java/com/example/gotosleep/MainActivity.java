@@ -8,7 +8,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -19,8 +21,6 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    public int t1Hour, t1Minute, t2Hour, t2Minute;
-
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String T1HOUR = "t1Hour";
     public static final String T1MINUTE = "t1Minute";
@@ -30,9 +30,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String MUTE_SOUND_SWITCH = "muteSoundSwitch";
 
     public static boolean firstTime = true;
+    public static boolean buttonOn = true;
 
+    public int t1Hour, t1Minute, t2Hour, t2Minute;
+
+    private Button mainButton;
     private Switch vibrate, muteSound;
     private TextView startTime, endTime;
+
+    private App app = new App();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -44,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         endTime = findViewById(R.id.endTime);
         vibrate = findViewById(R.id.muteSoundSwitch);
         muteSound = findViewById(R.id.vibrateSwitch);
+        mainButton = findViewById(R.id.mainButton);
 
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         loadData();
+        mainButtonBehaviour(null);
     }
 
     @Override
@@ -154,5 +162,32 @@ public class MainActivity extends AppCompatActivity {
         output = LocalTime.parse(output).format(DateTimeFormatter.ofPattern("hh:mm a"));
 
         return output;
+    }
+
+    public void mainButtonBehaviour (View view) {
+        Log.d("wtf", "" + view);
+        if (buttonOn) {
+            if (view != null) {
+                mainButton.setText("OFF");
+                mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
+                buttonOn = false;
+                app.stopTimeChecking();
+                // Disable background process, checking time
+            }else {
+                mainButton.setText("ON");
+                mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
+            }
+        }else {
+            if (view != null) {
+                mainButton.setText("ON");
+                mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
+                buttonOn = true;
+                app.startTimeChecking();
+                // Enable background process, checking time
+            }else {
+                mainButton.setText("OFF");
+                mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
+            }
+        }
     }
 }
