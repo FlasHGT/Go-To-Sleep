@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class MainActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -28,19 +30,17 @@ public class MainActivity extends AppCompatActivity {
     public static final String T2MINUTE = "t2Minute";
     public static final String VIBRATE_SWTICH = "vibrateSwitch";
     public static final String MUTE_SOUND_SWITCH = "muteSoundSwitch";
+    public static final String TUTORIAL_COMPLETE = "tutorialComplete";
+    public static final String BUTTON_STATUS = "buttonStatus";
 
-    public static boolean firstTime = true;
-    public static boolean buttonOn = true;
-
+    public boolean tutorialComplete = false;
     public int t1Hour, t1Minute, t2Hour, t2Minute;
 
+    private boolean buttonStatus = true;
     private Button mainButton;
     private Switch vibrate, muteSound;
     private TextView startTime, endTime;
 
-    private App app = new App();
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,11 +123,12 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt(T1MINUTE, t1Minute);
         editor.putInt(T2HOUR, t2Hour);
         editor.putInt(T2MINUTE, t2Minute);
+        editor.putBoolean(TUTORIAL_COMPLETE, tutorialComplete);
+        editor.putBoolean(BUTTON_STATUS, buttonStatus);
 
         editor.apply();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 
@@ -135,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
         t1Minute = sharedPreferences.getInt(T1MINUTE, 0);
         t2Hour = sharedPreferences.getInt(T2HOUR, 0);
         t2Minute = sharedPreferences.getInt(T2MINUTE, 0);
+        tutorialComplete = sharedPreferences.getBoolean(TUTORIAL_COMPLETE, false);
+        buttonStatus = sharedPreferences.getBoolean(BUTTON_STATUS, true);
 
         startTime.setText(formatTimeString(t1Hour, t1Minute));
         endTime.setText(formatTimeString(t2Hour, t2Minute));
@@ -143,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
         muteSound.setChecked(sharedPreferences.getBoolean(MUTE_SOUND_SWITCH, false));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public String formatTimeString (int hour, int minute) {
         String output = "";
 
@@ -166,28 +168,42 @@ public class MainActivity extends AppCompatActivity {
 
     public void mainButtonBehaviour (View view) {
         Log.d("wtf", "" + view);
-        if (buttonOn) {
+        if (buttonStatus) {
             if (view != null) {
                 mainButton.setText("OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
-                buttonOn = false;
-                app.stopTimeChecking();
+                buttonStatus = false;
+                stopTimeChecking();
                 // Disable background process, checking time
             }else {
                 mainButton.setText("ON");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
+
+                if (!tutorialComplete) {
+                    startTimeChecking();
+                    tutorialComplete = true;
+                }
             }
         }else {
             if (view != null) {
                 mainButton.setText("ON");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
-                buttonOn = true;
-                app.startTimeChecking();
+                buttonStatus = true;
+                startTimeChecking();
                 // Enable background process, checking time
             }else {
                 mainButton.setText("OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
             }
         }
+    }
+
+    private void startTimeChecking () {
+        startService(new Intent(this, CheckTime.class));
+    }
+
+    private void stopTimeChecking () {
+        CheckTime.runsForTheFirstTime = true;
+        stopService(new Intent(this, CheckTime.class));
     }
 }

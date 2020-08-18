@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -14,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executors;
@@ -24,11 +22,12 @@ import java.util.concurrent.TimeUnit;
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class CheckTime extends Service {
 
+    public static boolean runsForTheFirstTime = true;
+
     private static final int NOTIF_ID = 1;
     private static final String NOTIF_CHANNEL_ID = "Main";
 
     private int secondsToDelay = 0;
-    private boolean runsForTheFirstTime = true;
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     private String currentTime = "";
@@ -41,7 +40,6 @@ public class CheckTime extends Service {
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
 
@@ -55,14 +53,14 @@ public class CheckTime extends Service {
                     runsForTheFirstTime = false;
                 }else {
                     scheduleTaskExecutor.shutdown();
-                    startANewExecution();
+                    startNewExecution();
+                    return;
                 }
 
                 Log.d("delay", "" + secondsToDelay);
 
                 //do stuff
 
-                Log.d("lol", "Working");
                 currentTime = formatter.format(OffsetDateTime.now());
 
             }
@@ -74,7 +72,7 @@ public class CheckTime extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void startANewExecution () {
+    public void startNewExecution() {
         secondsToDelay = 60;
 
         scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
@@ -82,10 +80,12 @@ public class CheckTime extends Service {
         scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
+                if (runsForTheFirstTime) {
+                    scheduleTaskExecutor.shutdown();
+                    return;
+                }
                 //do stuff
                 currentTime = formatter.format(OffsetDateTime.now());
-
-                Log.d("lol", "Working");
 
                 Log.d("delay", "" + secondsToDelay);
             }
@@ -93,7 +93,7 @@ public class CheckTime extends Service {
     }
 
     private void startForeground() {
-        Intent notificationIntent = new Intent(this, TimeActivity.class);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, 0);

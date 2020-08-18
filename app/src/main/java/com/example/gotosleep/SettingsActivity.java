@@ -11,12 +11,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Switch;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class SettingsActivity extends AppCompatActivity {
 
     private MainActivity mainActivity = new MainActivity();
     private Switch vibrate, muteSound;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +42,6 @@ public class SettingsActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
 
@@ -53,7 +52,6 @@ public class SettingsActivity extends AppCompatActivity {
     public void goToMainActivity (View view) {
         saveData();
 
-        mainActivity.firstTime = false;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finishAffinity();

@@ -16,17 +16,19 @@ import android.widget.TimePicker;
 
 import java.util.Calendar;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class TimeActivity extends AppCompatActivity {
 
     private MainActivity mainActivity = new MainActivity();
     private TextView startTime, endTime;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (mainActivity.firstTime) {
+        loadData();
+
+        if (!mainActivity.tutorialComplete) {
             setContentView(R.layout.activity_time);
 
             startTime = findViewById(R.id.startTime);
@@ -86,8 +88,6 @@ public class TimeActivity extends AppCompatActivity {
                     timePickerDialog.show();
                 }
             });
-
-            loadData();
         }else {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
@@ -114,7 +114,6 @@ public class TimeActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
 
@@ -122,9 +121,12 @@ public class TimeActivity extends AppCompatActivity {
         mainActivity.t1Minute = sharedPreferences.getInt(mainActivity.T1MINUTE, 0);
         mainActivity.t2Hour = sharedPreferences.getInt(mainActivity.T2HOUR, 6);
         mainActivity.t2Minute = sharedPreferences.getInt(mainActivity.T2MINUTE, 0);
+        mainActivity.tutorialComplete = sharedPreferences.getBoolean(mainActivity.TUTORIAL_COMPLETE, false);
 
-        startTime.setText(mainActivity.formatTimeString(mainActivity.t1Hour, mainActivity.t1Minute));
-        endTime.setText(mainActivity.formatTimeString(mainActivity.t2Hour, mainActivity.t2Minute));
+        if (startTime != null) {
+            startTime.setText(mainActivity.formatTimeString(mainActivity.t1Hour, mainActivity.t1Minute));
+            endTime.setText(mainActivity.formatTimeString(mainActivity.t2Hour, mainActivity.t2Minute));
+        }
     }
 
     public void goToSettingsActivity (View view) {
