@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean tutorialComplete = false;
     public int t1Hour, t1Minute, t2Hour, t2Minute;
 
+    public static int controlValue = 0; // (controlValue <= 1) no tasks running or one task running, (controlValue > 1) too many tasks are running, destroy instances until there is only one left.
+    public static boolean stopExecution = false;
+
     private boolean buttonStatus = true;
     private Button mainButton;
     private Switch vibrate, muteSound;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                                 calendar.set(0, 0, 0, t2Hour, t2Minute);
 
                                 endTime.setText(DateFormat.format("hh:mm aa", calendar));
+
                             }
                         }, 12, 0, false
                 );
@@ -199,11 +203,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimeChecking () {
+        if (stopExecution) {
+            stopExecution = false;
+        }
         startService(new Intent(this, CheckTime.class));
     }
 
     private void stopTimeChecking () {
-        CheckTime.runsForTheFirstTime = true;
+        stopExecution = true;
         stopService(new Intent(this, CheckTime.class));
     }
 }
