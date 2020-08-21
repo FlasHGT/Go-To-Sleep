@@ -45,8 +45,6 @@ public class CheckTime extends Service {
 
         secondsToDelay = 60 - OffsetDateTime.now().getSecond();
 
-        Log.d("123", "" + MainActivity.controlValue);
-
         if (MainActivity.controlValue != 0) {
             MainActivity.controlValue++;
         }
@@ -78,8 +76,6 @@ public class CheckTime extends Service {
                     MainActivity.controlValue++;
                 }
 
-                Log.d("123", "main: " + MainActivity.controlValue);
-
                 Log.d("delay", "" + secondsToDelay);
 
                 //do stuff
@@ -88,8 +84,6 @@ public class CheckTime extends Service {
 
             }
         }, 0, secondsToDelay, TimeUnit.SECONDS);
-
-        Log.d("123", "" + MainActivity.controlValue);
 
         createNotificationChannel();
         startForeground();

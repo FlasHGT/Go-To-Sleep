@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
                                 calendar.set(0, 0, 0, t1Hour, t1Minute);
 
                                 startTime.setText(DateFormat.format("hh:mm aa", calendar));
+
+                                Log.d("lol", "apply");
                             }
                         }, 12, 0, false
                 );
@@ -171,14 +173,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void mainButtonBehaviour (View view) {
-        Log.d("wtf", "" + view);
         if (buttonStatus) {
             if (view != null) {
                 mainButton.setText("OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
                 buttonStatus = false;
                 stopTimeChecking();
-                // Disable background process, checking time
             }else {
                 mainButton.setText("ON");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
                 buttonStatus = true;
                 startTimeChecking();
-                // Enable background process, checking time
             }else {
                 mainButton.setText("OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
