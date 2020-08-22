@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 startTime.setText(DateFormat.format("hh:mm aa", calendar));
 
-                                Log.d("lol", "apply");
+                                saveData();
                             }
                         }, 12, 0, false
                 );
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 endTime.setText(DateFormat.format("hh:mm aa", calendar));
 
+                                saveData();
                             }
                         }, 12, 0, false
                 );

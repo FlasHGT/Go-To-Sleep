@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -26,10 +27,12 @@ public class CheckTime extends Service {
     private static final int NOTIF_ID = 1;
     private static final String NOTIF_CHANNEL_ID = "Main";
 
+    private MainActivity mainActivity = new MainActivity();
+
     private int secondsToDelay = 0;
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-    private String currentTime = "";
+    private int currentHour = 0;
+    private int currentMin = 0;
 
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> scheduledFuture;
@@ -42,7 +45,6 @@ public class CheckTime extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId){
-
         secondsToDelay = 60 - OffsetDateTime.now().getSecond();
 
         if (MainActivity.controlValue != 0) {
@@ -76,11 +78,19 @@ public class CheckTime extends Service {
                     MainActivity.controlValue++;
                 }
 
+                loadData();
+
                 Log.d("delay", "" + secondsToDelay);
 
                 //do stuff
+                currentHour = OffsetDateTime.now().getHour();
+                currentMin = OffsetDateTime.now().getMinute();
 
-                currentTime = formatter.format(OffsetDateTime.now());
+                if (checkTimeInRange()) {
+                    Log.d("123", "In range");
+                }else {
+                    Log.d("123", "Out of range");
+                }
 
             }
         }, 0, secondsToDelay, TimeUnit.SECONDS);
@@ -103,12 +113,40 @@ public class CheckTime extends Service {
                     return;
                 }
 
+                loadData();
                 //do stuff
-                currentTime = formatter.format(OffsetDateTime.now());
+
+                currentHour = OffsetDateTime.now().getHour();
+                currentMin = OffsetDateTime.now().getMinute();
+
+                if (checkTimeInRange()) {
+                    Log.d("123", "In range");
+                }else {
+                    Log.d("123", "Out of range");
+                }
 
                 Log.d("delay", "" + secondsToDelay);
+
             }
         }, 0, secondsToDelay, TimeUnit.SECONDS);
+    }
+
+    public void loadData () {
+        SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
+
+        mainActivity.t1Hour = sharedPreferences.getInt(mainActivity.T1HOUR, 0);
+        mainActivity.t1Minute = sharedPreferences.getInt(mainActivity.T1MINUTE, 0);
+        mainActivity.t2Hour = sharedPreferences.getInt(mainActivity.T2HOUR, 6);
+        mainActivity.t2Minute = sharedPreferences.getInt(mainActivity.T2MINUTE, 0);
+    }
+
+    private boolean checkTimeInRange () {
+        if (mainActivity.t1Hour <= currentHour && mainActivity.t2Hour >= currentHour &&
+            mainActivity.t1Minute <= currentMin && mainActivity.t2Minute >= currentMin) {
+            return true;
+        }else {
+            return  false;
+        }
     }
 
     private void startForeground() {
