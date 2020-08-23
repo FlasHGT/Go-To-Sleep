@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Display;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -28,6 +29,7 @@ public class CheckTime extends Service {
     private static final String NOTIF_CHANNEL_ID = "Main";
 
     private MainActivity mainActivity = new MainActivity();
+    private Display display;
 
     private int secondsToDelay = 0;
 
@@ -52,6 +54,7 @@ public class CheckTime extends Service {
         }
 
         scheduledFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.R)
             public void run() {
                 if (MainActivity.stopExecution) {
                     MainActivity.controlValue--;
@@ -86,7 +89,9 @@ public class CheckTime extends Service {
                 currentHour = OffsetDateTime.now().getHour();
                 currentMin = OffsetDateTime.now().getMinute();
 
-                if (checkTimeInRange()) {
+                display = getDisplay();
+
+                if (checkTimeInRange() && display.getState() == 2) {  // 1 - screen off, 2 - screen on
                     Log.d("123", "In range");
                 }else {
                     Log.d("123", "Out of range");
@@ -119,7 +124,7 @@ public class CheckTime extends Service {
                 currentHour = OffsetDateTime.now().getHour();
                 currentMin = OffsetDateTime.now().getMinute();
 
-                if (checkTimeInRange()) {
+                if (checkTimeInRange() && display.getState() == 2) {
                     Log.d("123", "In range");
                 }else {
                     Log.d("123", "Out of range");
@@ -145,7 +150,7 @@ public class CheckTime extends Service {
             mainActivity.t1Minute <= currentMin && mainActivity.t2Minute >= currentMin) {
             return true;
         }else {
-            return  false;
+            return false;
         }
     }
 
