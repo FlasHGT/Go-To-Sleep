@@ -4,10 +4,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Display;
 
@@ -16,7 +18,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -36,8 +37,11 @@ public class CheckTime extends Service {
     private int currentHour = 0;
     private int currentMin = 0;
 
+    private Vibrator vibrator;
+
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> scheduledFuture;
+    private ScheduledFuture<?> vibrateFuture;
 
     @Nullable
     @Override
@@ -48,6 +52,8 @@ public class CheckTime extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId){
         secondsToDelay = 60 - OffsetDateTime.now().getSecond();
+
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         if (MainActivity.controlValue != 0) {
             MainActivity.controlValue++;
@@ -81,21 +87,18 @@ public class CheckTime extends Service {
                     MainActivity.controlValue++;
                 }
 
-                loadData();
-
-                Log.d("delay", "" + secondsToDelay);
-
-                //do stuff
                 currentHour = OffsetDateTime.now().getHour();
                 currentMin = OffsetDateTime.now().getMinute();
 
                 display = getDisplay();
 
-                if (checkTimeInRange() && display.getState() == 2) {  // 1 - screen off, 2 - screen on
-                    Log.d("123", "In range");
+                if (checkTimeInRange() && display.getState() == Display.STATE_ON) {  // 1 - screen off, 2 - screen on
+                    startVibration();
                 }else {
-                    Log.d("123", "Out of range");
+
                 }
+
+                Log.d("delay", "" + secondsToDelay);
 
             }
         }, 0, secondsToDelay, TimeUnit.SECONDS);
@@ -118,16 +121,13 @@ public class CheckTime extends Service {
                     return;
                 }
 
-                loadData();
-                //do stuff
-
                 currentHour = OffsetDateTime.now().getHour();
                 currentMin = OffsetDateTime.now().getMinute();
 
-                if (checkTimeInRange() && display.getState() == 2) {
-                    Log.d("123", "In range");
+                if (checkTimeInRange() && display.getState() == Display.STATE_ON) {
+                    startVibration();
                 }else {
-                    Log.d("123", "Out of range");
+
                 }
 
                 Log.d("delay", "" + secondsToDelay);
@@ -145,9 +145,26 @@ public class CheckTime extends Service {
         mainActivity.t2Minute = sharedPreferences.getInt(mainActivity.T2MINUTE, 0);
     }
 
+    private void startVibration() {
+        vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                if ((checkTimeInRange() && display.getState() == Display.STATE_ON) && !MainActivity.stopExecution) {
+                    Log.d("123", "vibrate");
+                    vibrator.vibrate(1000);
+                }else {
+                    vibrateFuture.cancel(true);
+                }
+            }
+        },0,2, TimeUnit.SECONDS);
+    }
+
     private boolean checkTimeInRange () {
-        if (mainActivity.t1Hour <= currentHour && mainActivity.t2Hour >= currentHour &&
-            mainActivity.t1Minute <= currentMin && mainActivity.t2Minute >= currentMin) {
+        loadData();
+
+        if (mainActivity.t1Hour <= currentHour && mainActivity.t2Hour >= currentHour && mainActivity.t1Minute <= currentMin &&
+           (mainActivity.t2Minute >= currentMin || (mainActivity.t2Minute < currentMin && mainActivity.t2Hour > currentHour) || (mainActivity.t2Minute > currentMin && mainActivity.t2Hour == currentHour))
+        ) {
             return true;
         }else {
             return false;
