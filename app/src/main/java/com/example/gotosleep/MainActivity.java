@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
@@ -35,13 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean tutorialComplete = false;
     public int t1Hour, t1Minute, t2Hour, t2Minute;
+    public Switch muteSound, vibrate;
 
     public static int controlValue = 0; // (controlValue <= 1) no tasks running or one task running, (controlValue > 1) too many tasks are running, destroy instances until there is only one left.
     public static boolean stopExecution = false;
 
     private boolean buttonStatus = true;
     private Button mainButton;
-    private Switch vibrate, muteSound;
     private TextView startTime, endTime;
 
     @Override
@@ -51,9 +50,23 @@ public class MainActivity extends AppCompatActivity {
 
         startTime = findViewById(R.id.startTime);
         endTime = findViewById(R.id.endTime);
-        vibrate = findViewById(R.id.muteSoundSwitch);
-        muteSound = findViewById(R.id.vibrateSwitch);
+        muteSound = findViewById(R.id.muteSoundSwitch);
+        vibrate = findViewById(R.id.vibrateSwitch);
         mainButton = findViewById(R.id.mainButton);
+
+        muteSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View view) {
+                saveData();
+            }
+        });
+
+        vibrate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View view) {
+                saveData();
+            }
+        });
 
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putBoolean(MUTE_SOUND_SWITCH, muteSound.isChecked());
-        editor.putBoolean(VIBRATE_SWTICH, vibrate.isChecked());
+        editor.putBoolean(MUTE_SOUND_SWITCH, vibrate.isChecked());
+        editor.putBoolean(VIBRATE_SWTICH, muteSound.isChecked());
         editor.putInt(T1HOUR, t1Hour);
         editor.putInt(T1MINUTE, t1Minute);
         editor.putInt(T2HOUR, t2Hour);
@@ -149,8 +162,8 @@ public class MainActivity extends AppCompatActivity {
         startTime.setText(formatTimeString(t1Hour, t1Minute));
         endTime.setText(formatTimeString(t2Hour, t2Minute));
 
-        vibrate.setChecked(sharedPreferences.getBoolean(VIBRATE_SWTICH, false));
-        muteSound.setChecked(sharedPreferences.getBoolean(MUTE_SOUND_SWITCH, false));
+        muteSound.setChecked(sharedPreferences.getBoolean(VIBRATE_SWTICH, false));
+        vibrate.setChecked(sharedPreferences.getBoolean(MUTE_SOUND_SWITCH, false));
     }
 
     public String formatTimeString (int hour, int minute) {
@@ -174,6 +187,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void mainButtonBehaviour (View view) {
+        saveData();
+
         if (buttonStatus) {
             if (view != null) {
                 mainButton.setText("OFF");

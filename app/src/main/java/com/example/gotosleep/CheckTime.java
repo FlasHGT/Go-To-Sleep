@@ -7,9 +7,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
 
@@ -38,6 +40,9 @@ public class CheckTime extends Service {
     private int currentMin = 0;
 
     private Vibrator vibrator;
+    private AudioManager audioManager;
+    private boolean vibratorSwitched = false;
+    private boolean muteSoundSwitched = false;
 
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> scheduledFuture;
@@ -53,6 +58,7 @@ public class CheckTime extends Service {
     public int onStartCommand(Intent intent, int flags, final int startId){
         secondsToDelay = 60 - OffsetDateTime.now().getSecond();
 
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         if (MainActivity.controlValue != 0) {
@@ -92,10 +98,18 @@ public class CheckTime extends Service {
 
                 display = getDisplay();
 
-                if (checkTimeInRange() && display.getState() == Display.STATE_ON) {  // 1 - screen off, 2 - screen on
-                    startVibration();
-                }else {
+                if (checkTimeInRange()) {  // 1 - screen off, 2 - screen on
+                    if (muteSoundSwitched) {
+                        muteSound();
+                    }
 
+                    if (display.getState() == Display.STATE_ON) {
+                        if (vibratorSwitched) {
+                            startVibration();
+                        }
+                    }
+                }else {
+                    unmuteSound();
                 }
 
                 Log.d("delay", "" + secondsToDelay);
@@ -124,10 +138,20 @@ public class CheckTime extends Service {
                 currentHour = OffsetDateTime.now().getHour();
                 currentMin = OffsetDateTime.now().getMinute();
 
-                if (checkTimeInRange() && display.getState() == Display.STATE_ON) {
-                    startVibration();
-                }else {
+                if (checkTimeInRange()) {  // 1 - screen off, 2 - screen on
+                    if (muteSoundSwitched) {
+                        muteSound();
+                    }
 
+                    if (display.getState() == Display.STATE_ON) {
+                        if (vibratorSwitched) {
+                            startVibration();
+                        }
+                    }
+                }else {
+                    if (muteSoundSwitched) {
+                        unmuteSound();
+                    }
                 }
 
                 Log.d("delay", "" + secondsToDelay);
@@ -143,20 +167,61 @@ public class CheckTime extends Service {
         mainActivity.t1Minute = sharedPreferences.getInt(mainActivity.T1MINUTE, 0);
         mainActivity.t2Hour = sharedPreferences.getInt(mainActivity.T2HOUR, 6);
         mainActivity.t2Minute = sharedPreferences.getInt(mainActivity.T2MINUTE, 0);
+        vibratorSwitched = sharedPreferences.getBoolean(mainActivity.VIBRATE_SWTICH, false);
+        muteSoundSwitched = sharedPreferences.getBoolean(mainActivity.MUTE_SOUND_SWITCH, false);
     }
 
     private void startVibration() {
-        vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                if ((checkTimeInRange() && display.getState() == Display.STATE_ON) && !MainActivity.stopExecution) {
-                    Log.d("123", "vibrate");
-                    vibrator.vibrate(1000);
-                }else {
-                    vibrateFuture.cancel(true);
+        if (vibrateFuture == null) {
+            vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    if ((checkTimeInRange() && display.getState() == Display.STATE_ON) && !MainActivity.stopExecution && vibratorSwitched) {
+                        Log.d("123", "vibrate");
+                        vibrator.vibrate(1000);
+                    }else {
+                        vibrateFuture.cancel(true);
+                        vibrateFuture = null;
+                    }
+
+                    if (!muteSoundSwitched) {
+                        unmuteSound();
+                    }
                 }
-            }
-        },0,2, TimeUnit.SECONDS);
+            },0,2, TimeUnit.SECONDS);
+        }
+    }
+
+    private void muteSound () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_MUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_MUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0);
+        } else {
+            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+            audioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
+            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+            audioManager.setStreamMute(AudioManager.STREAM_RING, true);
+            audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+        }
+    }
+
+    private void unmuteSound () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_UNMUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_UNMUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE,0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_UNMUTE, 0);
+        } else {
+            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+            audioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
+            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+            audioManager.setStreamMute(AudioManager.STREAM_RING, false);
+            audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+        }
     }
 
     private boolean checkTimeInRange () {
