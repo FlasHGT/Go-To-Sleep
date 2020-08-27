@@ -245,16 +245,15 @@ public class CheckTime extends Service {
         startForeground(NOTIF_ID, new NotificationCompat.Builder(this,
                 NOTIF_CHANNEL_ID) // don't forget create a notification channel first
                 .setOngoing(true)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText("Service is running background")
+                .setSmallIcon(R.drawable.ic_transparent)
+                .setContentText("Checking time")
                 .setContentIntent(pendingIntent)
                 .build());
     }
 
     private void createNotificationChannel () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Register Time";
+            CharSequence name = "Registering time";
             int importance = NotificationManager.IMPORTANCE_MIN;
             NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID, name, importance);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
