@@ -217,6 +217,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void infoButton (View view) {
+        InfoDialog infoDialog = new InfoDialog();
+        infoDialog.show(getSupportFragmentManager(), "info dialog");
+    }
+
+
     private void startTimeChecking () {
         if (stopExecution) {
             stopExecution = false;
