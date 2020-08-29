@@ -1,12 +1,10 @@
 package com.example.gotosleep;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -15,11 +13,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 
-@RequiresApi(api = Build.VERSION_CODES.O)
 public class MainActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -169,6 +169,20 @@ public class MainActivity extends AppCompatActivity {
     public String formatTimeString (int hour, int minute) {
         String output = "";
 
+        String timeOfDay = "";
+
+        if (hour > 12) {
+            hour = hour - 12;
+
+            timeOfDay = "PM";
+        }else {
+            timeOfDay = "AM";
+
+            if (hour == 0) {
+                hour = 12;
+            }
+        }
+
         if (hour < 10) {
             output += "0" + hour + ":";
         }else {
@@ -181,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             output += minute;
         }
 
-        output = LocalTime.parse(output).format(DateTimeFormatter.ofPattern("hh:mm a"));
+        output += " " + timeOfDay;
 
         return output;
     }

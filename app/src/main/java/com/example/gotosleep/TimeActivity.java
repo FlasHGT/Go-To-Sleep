@@ -1,22 +1,18 @@
 package com.example.gotosleep;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
 
-@RequiresApi(api = Build.VERSION_CODES.O)
 public class TimeActivity extends AppCompatActivity {
 
     private MainActivity mainActivity = new MainActivity();
@@ -50,8 +46,6 @@ public class TimeActivity extends AppCompatActivity {
                                     calendar.set(0, 0, 0, mainActivity.t1Hour, mainActivity.t1Minute);
 
                                     startTime.setText(DateFormat.format("hh:mm aa", calendar));
-
-
                                 }
                             }, 12, 0, false
                     );
@@ -78,8 +72,6 @@ public class TimeActivity extends AppCompatActivity {
                                     calendar.set(0, 0, 0, mainActivity.t2Hour, mainActivity.t2Minute);
 
                                     endTime.setText(DateFormat.format("hh:mm aa", calendar));
-
-                                    Log.d("lol", "" + mainActivity.t2Hour);
                                 }
                             }, 12, 0, false
                     );
