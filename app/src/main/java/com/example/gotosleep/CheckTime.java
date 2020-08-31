@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.Display;
 
 import androidx.annotation.Nullable;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
@@ -28,6 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+@RequiresApi(api = Build.VERSION_CODES.KITKAT_WATCH)
 public class CheckTime extends Service {
 
     private static final int NOTIF_ID = 1;
@@ -73,7 +73,6 @@ public class CheckTime extends Service {
         }
 
         scheduledFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.R)
             public void run() {
                 if (MainActivity.stopExecution) {
                     MainActivity.controlValue--;
@@ -111,7 +110,9 @@ public class CheckTime extends Service {
                     currentMin = Integer.parseInt(separated[1]);
                 }
 
-                display = getDisplay();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    display = getDisplay();
+                }
 
                 if (checkTimeInRange()) {  // 1 - screen off, 2 - screen on
                     if (muteSoundSwitched) {
@@ -142,7 +143,6 @@ public class CheckTime extends Service {
         secondsToDelay = 60;
 
         scheduledFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
                 if (MainActivity.stopExecution) {
                     scheduledFuture.cancel(true);
@@ -197,11 +197,9 @@ public class CheckTime extends Service {
     private void startVibration() {
         if (vibrateFuture == null) {
             vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT_WATCH)
                 @Override
                 public void run() {
                     if ((checkTimeInRange() && display.getState() == Display.STATE_ON) && !MainActivity.stopExecution && vibratorSwitched) {
-                        Log.d("123", "vibrate");
                         vibrator.vibrate(1000);
                     }else {
                         vibrateFuture.cancel(true);
