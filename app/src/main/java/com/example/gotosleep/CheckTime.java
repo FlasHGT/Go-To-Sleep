@@ -11,21 +11,23 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
 
 import androidx.annotation.Nullable;
+
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-@RequiresApi(api = Build.VERSION_CODES.O)
 public class CheckTime extends Service {
 
     private static final int NOTIF_ID = 1;
@@ -56,7 +58,12 @@ public class CheckTime extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId){
-        secondsToDelay = 60 - OffsetDateTime.now().getSecond();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            secondsToDelay = 60 - OffsetDateTime.now().getSecond();
+        }else {
+            String currentSeconds = new SimpleDateFormat("ss", Locale.getDefault()).format(new Date());
+            secondsToDelay = 60 - Integer.parseInt(currentSeconds);
+        }
 
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -93,8 +100,16 @@ public class CheckTime extends Service {
                     MainActivity.controlValue++;
                 }
 
-                currentHour = OffsetDateTime.now().getHour();
-                currentMin = OffsetDateTime.now().getMinute();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    currentHour = OffsetDateTime.now().getHour();
+                    currentMin = OffsetDateTime.now().getMinute();
+                }else {
+                    String currentTime = new SimpleDateFormat("hh:mm", Locale.getDefault()).format(new Date());
+                    String[] separated = currentTime.split(":");
+
+                    currentHour = Integer.parseInt(separated[0]);
+                    currentMin = Integer.parseInt(separated[1]);
+                }
 
                 display = getDisplay();
 
@@ -135,8 +150,16 @@ public class CheckTime extends Service {
                     return;
                 }
 
-                currentHour = OffsetDateTime.now().getHour();
-                currentMin = OffsetDateTime.now().getMinute();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    currentHour = OffsetDateTime.now().getHour();
+                    currentMin = OffsetDateTime.now().getMinute();
+                }else {
+                    String currentTime = new SimpleDateFormat("hh:mm", Locale.getDefault()).format(new Date());
+                    String[] separated = currentTime.split(":");
+
+                    currentHour = Integer.parseInt(separated[0]);
+                    currentMin = Integer.parseInt(separated[1]);
+                }
 
                 if (checkTimeInRange()) {  // 1 - screen off, 2 - screen on
                     if (muteSoundSwitched) {
@@ -174,6 +197,7 @@ public class CheckTime extends Service {
     private void startVibration() {
         if (vibrateFuture == null) {
             vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT_WATCH)
                 @Override
                 public void run() {
                     if ((checkTimeInRange() && display.getState() == Display.STATE_ON) && !MainActivity.stopExecution && vibratorSwitched) {
