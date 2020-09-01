@@ -46,7 +46,7 @@ public class CheckTime extends Service {
     private boolean vibratorSwitched = false;
     private boolean muteSoundSwitched = false;
 
-    private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> scheduledFuture;
     private ScheduledFuture<?> vibrateFuture;
 
@@ -73,6 +73,7 @@ public class CheckTime extends Service {
         }
 
         scheduledFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.R)
             public void run() {
                 if (MainActivity.stopExecution) {
                     MainActivity.controlValue--;
@@ -110,20 +111,19 @@ public class CheckTime extends Service {
                     currentMin = Integer.parseInt(separated[1]);
                 }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    display = getDisplay();
-                }
+                display = getDisplay();
 
-                if (checkTimeInRange()) {  // 1 - screen off, 2 - screen on
+                if (checkTimeInRange()) {
+
+
                     if (muteSoundSwitched) {
                         muteSound();
                     }
 
-                    if (display.getState() == Display.STATE_ON) {
-                        if (vibratorSwitched) {
-                            startVibration();
-                        }
+                    if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
+                        startVibration();
                     }
+
                 }else {
                     unmuteSound();
                 }
@@ -161,15 +161,13 @@ public class CheckTime extends Service {
                     currentMin = Integer.parseInt(separated[1]);
                 }
 
-                if (checkTimeInRange()) {  // 1 - screen off, 2 - screen on
+                if (checkTimeInRange()) {
                     if (muteSoundSwitched) {
                         muteSound();
                     }
 
-                    if (display.getState() == Display.STATE_ON) {
-                        if (vibratorSwitched) {
-                            startVibration();
-                        }
+                    if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
+                        startVibration();
                     }
                 }else {
                     if (muteSoundSwitched) {
@@ -199,15 +197,20 @@ public class CheckTime extends Service {
             vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    if ((checkTimeInRange() && display.getState() == Display.STATE_ON) && !MainActivity.stopExecution && vibratorSwitched) {
-                        vibrator.vibrate(1000);
+                    if (checkTimeInRange()) {
+                        if (display.getState() == Display.STATE_OFF && (MainActivity.stopExecution || !vibratorSwitched)) {
+                            vibrateFuture.cancel(true);
+                            vibrateFuture = null;
+                            return;
+                        }
+
+                        if (display.getState() == Display.STATE_ON && !MainActivity.stopExecution && vibratorSwitched) {
+                            Log.d("123", "vibrate");
+                            vibrator.vibrate(1000);
+                        }
                     }else {
                         vibrateFuture.cancel(true);
                         vibrateFuture = null;
-                    }
-
-                    if (!muteSoundSwitched) {
-                        unmuteSound();
                     }
                 }
             },0,2, TimeUnit.SECONDS);

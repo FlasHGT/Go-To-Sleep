@@ -13,12 +13,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -208,10 +203,17 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setText("OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
                 buttonStatus = false;
+
+                vibrate.setEnabled(true);
+                muteSound.setEnabled(true);
+
                 stopTimeChecking();
             }else {
                 mainButton.setText("ON");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
+
+                vibrate.setEnabled(false);
+                muteSound.setEnabled(false);
 
                 if (!tutorialComplete) {
                     startTimeChecking();
@@ -223,10 +225,17 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setText("ON");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
                 buttonStatus = true;
+
+                vibrate.setEnabled(false);
+                muteSound.setEnabled(false);
+
                 startTimeChecking();
             }else {
                 mainButton.setText("OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
+
+                vibrate.setEnabled(true);
+                muteSound.setEnabled(true);
             }
         }
     }
