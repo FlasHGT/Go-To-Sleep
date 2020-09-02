@@ -114,10 +114,8 @@ public class CheckTime extends Service {
                 display = getDisplay();
 
                 if (checkTimeInRange()) {
-
-
                     if (muteSoundSwitched) {
-                        muteSound();
+                        controlSound(true);
                     }
 
                     if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
@@ -125,7 +123,9 @@ public class CheckTime extends Service {
                     }
 
                 }else {
-                    unmuteSound();
+                    if (muteSoundSwitched) {
+                        controlSound(false);
+                    }
                 }
 
                 Log.d("delay", "" + secondsToDelay);
@@ -163,7 +163,7 @@ public class CheckTime extends Service {
 
                 if (checkTimeInRange()) {
                     if (muteSoundSwitched) {
-                        muteSound();
+                        controlSound(true);
                     }
 
                     if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
@@ -171,7 +171,7 @@ public class CheckTime extends Service {
                     }
                 }else {
                     if (muteSoundSwitched) {
-                        unmuteSound();
+                        controlSound(false);
                     }
                 }
 
@@ -217,36 +217,41 @@ public class CheckTime extends Service {
         }
     }
 
-    private void muteSound () {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_MUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_MUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0);
-        } else {
-            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-            audioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
-            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-            audioManager.setStreamMute(AudioManager.STREAM_RING, true);
-            audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+    private void controlSound(boolean muteSound) {
+        if (muteSound) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_MUTE, 0);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_MUTE, 0);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0);
+            } else {
+                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+                audioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
+                audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+                audioManager.setStreamMute(AudioManager.STREAM_RING, true);
+                audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+            }
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (audioManager.isStreamMute(AudioManager.STREAM_MUSIC)) {
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_UNMUTE, 0);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_UNMUTE, 0);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE,0);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_UNMUTE, 0);
+                }
+            } else {
+                if (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0) {
+                    audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+                    audioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
+                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+                    audioManager.setStreamMute(AudioManager.STREAM_RING, false);
+                    audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+                }
+            }
         }
-    }
 
-    private void unmuteSound () {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_UNMUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_UNMUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE,0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
-            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_UNMUTE, 0);
-        } else {
-            audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-            audioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
-            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-            audioManager.setStreamMute(AudioManager.STREAM_RING, false);
-            audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
-        }
     }
 
     private boolean checkTimeInRange () {
