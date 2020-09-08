@@ -46,6 +46,8 @@ public class CheckTime extends Service {
     private boolean vibratorSwitched = false;
     private boolean muteSoundSwitched = false;
 
+    private SimpleDateFormat inputParser = new SimpleDateFormat("HH:mm", Locale.US);
+
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> scheduledFuture;
     private ScheduledFuture<?> vibrateFuture;
@@ -257,9 +259,11 @@ public class CheckTime extends Service {
     private boolean checkTimeInRange () {
         loadData();
 
-        if (mainActivity.t1Hour <= currentHour && mainActivity.t2Hour >= currentHour && mainActivity.t1Minute <= currentMin &&
-           (mainActivity.t2Minute >= currentMin || (mainActivity.t2Minute < currentMin && mainActivity.t2Hour > currentHour) || (mainActivity.t2Minute > currentMin && mainActivity.t2Hour == currentHour))
-        ) {
+        if ((mainActivity.t1Hour <= currentHour || mainActivity.t2Hour < mainActivity.t1Hour)
+                && mainActivity.t2Hour >= currentHour
+                && (mainActivity.t1Minute <= currentMin || (mainActivity.t1Hour < currentHour || mainActivity.t2Hour < mainActivity.t1Hour))
+                && (mainActivity.t2Minute >= currentMin || mainActivity.t2Hour > currentHour))
+        {
             return true;
         }else {
             return false;
