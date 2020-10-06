@@ -18,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.example.gotosleep.ui.main.TimeFragment;
+
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -33,7 +35,7 @@ public class CheckTime extends Service {
     private static final int NOTIF_ID = 1;
     private static final String NOTIF_CHANNEL_ID = "Main";
 
-    private MainActivity mainActivity = new MainActivity();
+    private TimeFragment timeFragment = new TimeFragment();
     private Display display;
 
     private int secondsToDelay = 0;
@@ -46,8 +48,6 @@ public class CheckTime extends Service {
     private boolean vibratorSwitched = false;
     private boolean muteSoundSwitched = false;
 
-    private SimpleDateFormat inputParser = new SimpleDateFormat("HH:mm", Locale.US);
-
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> scheduledFuture;
     private ScheduledFuture<?> vibrateFuture;
@@ -59,7 +59,7 @@ public class CheckTime extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, final int startId){
+    public int onStartCommand(Intent intent, int flags, final int startId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             secondsToDelay = 60 - OffsetDateTime.now().getSecond();
         }else {
@@ -92,7 +92,8 @@ public class CheckTime extends Service {
                     MainActivity.controlValue--;
                     scheduledFuture.cancel(true);
                     return;
-                } else if (MainActivity.controlValue == 1) {
+                }
+                else if (MainActivity.controlValue == 1) {
                     scheduledFuture.cancel(true);
                     startNewExecution();
                     return;
@@ -184,14 +185,14 @@ public class CheckTime extends Service {
     }
 
     public void loadData () {
-        SharedPreferences sharedPreferences = getSharedPreferences(mainActivity.SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SHARED_PREFS, MODE_PRIVATE);
 
-        mainActivity.t1Hour = sharedPreferences.getInt(mainActivity.T1HOUR, 0);
-        mainActivity.t1Minute = sharedPreferences.getInt(mainActivity.T1MINUTE, 0);
-        mainActivity.t2Hour = sharedPreferences.getInt(mainActivity.T2HOUR, 6);
-        mainActivity.t2Minute = sharedPreferences.getInt(mainActivity.T2MINUTE, 0);
-        vibratorSwitched = sharedPreferences.getBoolean(mainActivity.VIBRATE_SWTICH, false);
-        muteSoundSwitched = sharedPreferences.getBoolean(mainActivity.MUTE_SOUND_SWITCH, false);
+        timeFragment.t1Hour = sharedPreferences.getInt(TimeFragment.T1HOUR, 0);
+        timeFragment.t1Minute = sharedPreferences.getInt(TimeFragment.T1MINUTE, 0);
+        timeFragment.t2Hour = sharedPreferences.getInt(TimeFragment.T2HOUR, 6);
+        timeFragment.t2Minute = sharedPreferences.getInt(TimeFragment.T2MINUTE, 0);
+        vibratorSwitched = sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false);
+        muteSoundSwitched = sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false);
     }
 
     private void startVibration() {
@@ -259,10 +260,10 @@ public class CheckTime extends Service {
     private boolean checkTimeInRange () {
         loadData();
 
-        if ((mainActivity.t1Hour <= currentHour || mainActivity.t2Hour < mainActivity.t1Hour)
-                && mainActivity.t2Hour >= currentHour
-                && (mainActivity.t1Minute <= currentMin || (mainActivity.t1Hour < currentHour || mainActivity.t2Hour < mainActivity.t1Hour))
-                && (mainActivity.t2Minute >= currentMin || mainActivity.t2Hour > currentHour))
+        if ((timeFragment.t1Hour <= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
+                && timeFragment.t2Hour >= currentHour
+                && (timeFragment.t1Minute <= currentMin || (timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour))
+                && (timeFragment.t2Minute >= currentMin || timeFragment.t2Hour > currentHour))
         {
             return true;
         }else {
