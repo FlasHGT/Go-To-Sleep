@@ -67,7 +67,7 @@ public class CheckTime extends Service {
             secondsToDelay = 60 - Integer.parseInt(currentSeconds);
         }
 
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         if (MainActivity.controlValue != 0) {
@@ -81,11 +81,13 @@ public class CheckTime extends Service {
                     MainActivity.controlValue--;
                     scheduledFuture.cancel(true);
 
-                    if (MainActivity.controlValue == 0) {
-                        MainActivity.stopExecution = false;
+                    if (muteSoundSwitched) {
+                        muteAllSound(false);
                     }
 
-                    return;
+                    if (MainActivity.controlValue == 0) {
+                        return;
+                    }
                 }
 
                 if (MainActivity.controlValue > 1) {
@@ -118,7 +120,7 @@ public class CheckTime extends Service {
 
                 if (checkTimeInRange()) {
                     if (muteSoundSwitched) {
-                        controlSound(true);
+                        muteAllSound(true);
                     }
 
                     if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
@@ -127,7 +129,7 @@ public class CheckTime extends Service {
 
                 }else {
                     if (muteSoundSwitched) {
-                        controlSound(false);
+                        muteAllSound(false);
                     }
                 }
 
@@ -166,7 +168,7 @@ public class CheckTime extends Service {
 
                 if (checkTimeInRange()) {
                     if (muteSoundSwitched) {
-                        controlSound(true);
+                        muteAllSound(true);
                     }
 
                     if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
@@ -174,7 +176,7 @@ public class CheckTime extends Service {
                     }
                 }else {
                     if (muteSoundSwitched) {
-                        controlSound(false);
+                        muteAllSound(false);
                     }
                 }
 
@@ -207,6 +209,16 @@ public class CheckTime extends Service {
                             return;
                         }
 
+                        if (muteSoundSwitched) {
+                            if (MainActivity.stopExecution) {
+                                muteAllSound(false);
+                            }else {
+                                muteAllSound(true);
+                            }
+                        }
+
+                        Log.d("123","" + MainActivity.stopExecution);
+
                         if (display.getState() == Display.STATE_ON && !MainActivity.stopExecution && vibratorSwitched) {
                             Log.d("123", "vibrate");
                             vibrator.vibrate(1000);
@@ -220,7 +232,7 @@ public class CheckTime extends Service {
         }
     }
 
-    private void controlSound(boolean muteSound) {
+    private void muteAllSound(boolean muteSound) {
         if (muteSound) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, AudioManager.ADJUST_MUTE, 0);

@@ -11,8 +11,8 @@
         android:id="@+id/description3"
         android:layout_width="350dp"
         android:layout_height="80dp"
-        android:layout_marginTop="128dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center"
         android:text="CHOOSE A TIME RANGE IN WHICH THIS APP WILL OPERATE"
         android:textColor="@color/white"
@@ -43,7 +43,7 @@
         android:id="@+id/startTime2"
         android:layout_width="176dp"
         android:layout_height="42dp"
-        android:layout_marginTop="275dp"
+        android:layout_marginTop="294dp"
         android:layout_marginBottom="48dp"
         android:background="@drawable/text_view_bottom_border"
         android:gravity="center"
@@ -54,7 +54,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/endTimeDesc2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
@@ -77,7 +77,7 @@
         android:id="@+id/endTime2"
         android:layout_width="176dp"
         android:layout_height="42dp"
-        android:layout_marginTop="375dp"
+        android:layout_marginTop="400dp"
         android:background="@drawable/text_view_bottom_border"
         android:gravity="center"
         android:text="06:00 AM"
@@ -94,14 +94,14 @@
 
     <ImageView
         android:id="@+id/clockImage2"
-        android:layout_width="83dp"
-        android:layout_height="94dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/description3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/ic_clock" />
+        app:srcCompat="@drawable/ic_baseline_access_time_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

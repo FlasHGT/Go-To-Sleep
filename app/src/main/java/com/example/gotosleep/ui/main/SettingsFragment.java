@@ -73,6 +73,6 @@ public class SettingsFragment extends Fragment {
 
         MainActivity.muteSound.setChecked(sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false));
         MainActivity.vibrate.setChecked(sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false));
-        mainActivity.buttonStatus = sharedPreferences.getBoolean(MainActivity.BUTTON_STATUS, true);
+        mainActivity.buttonStatus = sharedPreferences.getBoolean(MainActivity.BUTTON_STATUS, false);
     }
 }

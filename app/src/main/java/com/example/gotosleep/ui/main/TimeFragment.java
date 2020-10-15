@@ -121,7 +121,7 @@ public class TimeFragment extends Fragment
 
         t1Hour = sharedPreferences.getInt(T1HOUR, 0);
         t1Minute = sharedPreferences.getInt(T1MINUTE, 0);
-        t2Hour = sharedPreferences.getInt(T2HOUR, 0);
+        t2Hour = sharedPreferences.getInt(T2HOUR, 6);
         t2Minute = sharedPreferences.getInt(T2MINUTE, 0);
 
         startTime.setText(formatTimeString(t1Hour, t1Minute));
