@@ -24,8 +24,8 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        MainActivity.muteSound = view.findViewById(R.id.muteSoundSwitch3);
-        MainActivity.vibrate = view.findViewById(R.id.vibrateSwitch3);
+        MainActivity.muteSound = view.findViewById(R.id.muteSoundSwitch);
+        MainActivity.vibrate = view.findViewById(R.id.vibrateSwitch);
 
         MainActivity.muteSound.setOnClickListener(new View.OnClickListener() {
             @Override

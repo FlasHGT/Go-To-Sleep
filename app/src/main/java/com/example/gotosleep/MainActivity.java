@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     public void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 
-        buttonStatus = sharedPreferences.getBoolean(BUTTON_STATUS, true);
+        buttonStatus = sharedPreferences.getBoolean(BUTTON_STATUS, false);
     }
 
 
