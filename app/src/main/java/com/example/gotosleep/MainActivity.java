@@ -25,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String VIBRATE_SWITCH = "vibrateSwitch";
     public static final String MUTE_SOUND_SWITCH = "muteSoundSwitch";
+    public static final String SCREEN_FLASH = "screenFlashSwitch";
 
-    public static Switch muteSound, vibrate;
+    public static Switch muteSound, vibrate, screenFlash;
 
     public boolean buttonStatus = false;
 
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
                 vibrate.setEnabled(true);
                 muteSound.setEnabled(true);
+                screenFlash.setEnabled(true);
 
                 stopTimeChecking();
             }
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
                 vibrate.setEnabled(false);
                 muteSound.setEnabled(false);
+                screenFlash.setEnabled(false);
             }
         }
         else {
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
                 vibrate.setEnabled(false);
                 muteSound.setEnabled(false);
+                screenFlash.setEnabled(false);
 
                 startTimeChecking();
             }
@@ -95,15 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
                 vibrate.setEnabled(true);
                 muteSound.setEnabled(true);
+                screenFlash.setEnabled(true);
             }
         }
     }
-
-    public void infoButton (View view) {
-        InfoDialog infoDialog = new InfoDialog();
-        infoDialog.show(getSupportFragmentManager(), "info dialog");
-    }
-
 
     public void saveData () {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);

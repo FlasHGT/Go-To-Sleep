@@ -1,17 +1,21 @@
 package com.example.gotosleep.ui.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.gotosleep.ScreenFlashDialog;
 import com.example.gotosleep.MainActivity;
 import com.example.gotosleep.R;
 
@@ -26,6 +30,7 @@ public class SettingsFragment extends Fragment {
 
         MainActivity.muteSound = view.findViewById(R.id.muteSoundSwitch);
         MainActivity.vibrate = view.findViewById(R.id.vibrateSwitch);
+        MainActivity.screenFlash = view.findViewById(R.id.screenFlashSwitch);
 
         MainActivity.muteSound.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,6 +42,18 @@ public class SettingsFragment extends Fragment {
         MainActivity.vibrate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View view) {
+                saveData();
+            }
+        });
+
+        MainActivity.screenFlash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    ScreenFlashDialog screenFlashDialog = new ScreenFlashDialog();
+                    screenFlashDialog.show(getFragmentManager(), "info dialog");
+                }
+
                 saveData();
             }
         });
@@ -63,6 +80,7 @@ public class SettingsFragment extends Fragment {
 
         editor.putBoolean(MainActivity.MUTE_SOUND_SWITCH, MainActivity.muteSound.isChecked());
         editor.putBoolean(MainActivity.VIBRATE_SWITCH, MainActivity.vibrate.isChecked());
+        editor.putBoolean(MainActivity.SCREEN_FLASH, MainActivity.screenFlash.isChecked());
         editor.putBoolean(MainActivity.BUTTON_STATUS, mainActivity.buttonStatus);
 
         editor.apply();
@@ -73,6 +91,7 @@ public class SettingsFragment extends Fragment {
 
         MainActivity.muteSound.setChecked(sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false));
         MainActivity.vibrate.setChecked(sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false));
+        MainActivity.screenFlash.setChecked(sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH, false));
         mainActivity.buttonStatus = sharedPreferences.getBoolean(MainActivity.BUTTON_STATUS, false);
     }
 }

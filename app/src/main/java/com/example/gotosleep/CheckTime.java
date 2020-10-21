@@ -11,6 +11,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Display;
 
@@ -38,6 +39,9 @@ public class CheckTime extends Service {
     private TimeFragment timeFragment = new TimeFragment();
     private Display display;
 
+    private int brightness = 0;
+    private int startBrightness = 0;
+
     private int secondsToDelay = 0;
 
     private int currentHour = 0;
@@ -45,12 +49,14 @@ public class CheckTime extends Service {
 
     private Vibrator vibrator;
     private AudioManager audioManager;
+
     private boolean vibratorSwitched = false;
     private boolean muteSoundSwitched = false;
+    private boolean screenFlashSwitched = false;
 
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> scheduledFuture;
-    private ScheduledFuture<?> vibrateFuture;
+    private ScheduledFuture<?> activeFuture;
 
     @Nullable
     @Override
@@ -123,8 +129,14 @@ public class CheckTime extends Service {
                         muteAllSound(true);
                     }
 
-                    if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
-                        startVibration();
+                    if (display.getState() == Display.STATE_ON) { // 1 - screen off, 2 - screen on
+                        try {
+                            startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                        } catch (Settings.SettingNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                        activeBehaviour();
                     }
 
                 }else {
@@ -171,8 +183,8 @@ public class CheckTime extends Service {
                         muteAllSound(true);
                     }
 
-                    if (display.getState() == Display.STATE_ON && vibratorSwitched) { // 1 - screen off, 2 - screen on
-                        startVibration();
+                    if (display.getState() == Display.STATE_ON) { // 1 - screen off, 2 - screen on
+                        activeBehaviour();
                     }
                 }else {
                     if (muteSoundSwitched) {
@@ -195,18 +207,23 @@ public class CheckTime extends Service {
         timeFragment.t2Minute = sharedPreferences.getInt(TimeFragment.T2MINUTE, 0);
         vibratorSwitched = sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false);
         muteSoundSwitched = sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false);
+        screenFlashSwitched = sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH, false);
     }
 
-    private void startVibration() {
-        if (vibrateFuture == null) {
-            vibrateFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+    private void activeBehaviour() {
+        if (activeFuture == null) {
+            activeFuture = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
                     if (checkTimeInRange()) {
-                        if (display.getState() == Display.STATE_OFF && (MainActivity.stopExecution || !vibratorSwitched)) {
-                            vibrateFuture.cancel(true);
-                            vibrateFuture = null;
+                        if (display.getState() == Display.STATE_OFF && MainActivity.stopExecution) {
+                            activeFuture.cancel(true);
+                            activeFuture = null;
                             return;
+                        }
+
+                        if (MainActivity.stopExecution) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
                         }
 
                         if (muteSoundSwitched) {
@@ -217,15 +234,26 @@ public class CheckTime extends Service {
                             }
                         }
 
-                        Log.d("123","" + MainActivity.stopExecution);
+                        if (display.getState() == Display.STATE_ON && !MainActivity.stopExecution) {
+                            if (vibratorSwitched) {
+                                Log.d("123", "vibrate");
+                                vibrator.vibrate(1000);
+                            }
 
-                        if (display.getState() == Display.STATE_ON && !MainActivity.stopExecution && vibratorSwitched) {
-                            Log.d("123", "vibrate");
-                            vibrator.vibrate(1000);
+                            if (screenFlashSwitched) {
+                                if (brightness == 0) {
+                                    brightness = 255;
+                                }else {
+                                    brightness = 0;
+                                }
+
+                                android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
+                            }
                         }
                     }else {
-                        vibrateFuture.cancel(true);
-                        vibrateFuture = null;
+                        android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                        activeFuture.cancel(true);
+                        activeFuture = null;
                     }
                 }
             },0,2, TimeUnit.SECONDS);
