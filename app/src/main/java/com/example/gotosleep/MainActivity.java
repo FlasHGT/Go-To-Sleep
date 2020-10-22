@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String VIBRATE_SWITCH = "vibrateSwitch";
     public static final String MUTE_SOUND_SWITCH = "muteSoundSwitch";
-    public static final String SCREEN_FLASH = "screenFlashSwitch";
+    public static final String SCREEN_FLASH_SWITCH = "screenFlashSwitch";
 
     public static Switch muteSound, vibrate, screenFlash;
 
@@ -66,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
                 buttonStatus = false;
 
-                vibrate.setEnabled(true);
-                muteSound.setEnabled(true);
-                screenFlash.setEnabled(true);
+                enableSwitches();
 
                 stopTimeChecking();
             }
@@ -76,9 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setText("TURN OFF");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
 
-                vibrate.setEnabled(false);
-                muteSound.setEnabled(false);
-                screenFlash.setEnabled(false);
+                disableSwitches();
             }
         }
         else {
@@ -87,9 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
                 buttonStatus = true;
 
-                vibrate.setEnabled(false);
-                muteSound.setEnabled(false);
-                screenFlash.setEnabled(false);
+                disableSwitches();
 
                 startTimeChecking();
             }
@@ -97,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setText("TURN ON");
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
 
-                vibrate.setEnabled(true);
-                muteSound.setEnabled(true);
-                screenFlash.setEnabled(true);
+                enableSwitches();
             }
         }
     }
@@ -117,6 +109,17 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus = sharedPreferences.getBoolean(BUTTON_STATUS, false);
     }
 
+    private void enableSwitches () {
+        vibrate.setEnabled(true);
+        muteSound.setEnabled(true);
+        screenFlash.setEnabled(true);
+    }
+
+    private void disableSwitches () {
+        vibrate.setEnabled(false);
+        muteSound.setEnabled(false);
+        screenFlash.setEnabled(false);
+    }
 
     private void startTimeChecking () {
         if (stopExecution) {

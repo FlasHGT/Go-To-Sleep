@@ -1,7 +1,6 @@
 package com.example.gotosleep.ui.main;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +78,7 @@ public class SettingsFragment extends Fragment {
 
         editor.putBoolean(MainActivity.MUTE_SOUND_SWITCH, MainActivity.muteSound.isChecked());
         editor.putBoolean(MainActivity.VIBRATE_SWITCH, MainActivity.vibrate.isChecked());
-        editor.putBoolean(MainActivity.SCREEN_FLASH, MainActivity.screenFlash.isChecked());
+        editor.putBoolean(MainActivity.SCREEN_FLASH_SWITCH, MainActivity.screenFlash.isChecked());
         editor.putBoolean(MainActivity.BUTTON_STATUS, mainActivity.buttonStatus);
 
         editor.apply();
@@ -91,7 +89,7 @@ public class SettingsFragment extends Fragment {
 
         MainActivity.muteSound.setChecked(sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false));
         MainActivity.vibrate.setChecked(sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false));
-        MainActivity.screenFlash.setChecked(sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH, false));
+        MainActivity.screenFlash.setChecked(sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH_SWITCH, false));
         mainActivity.buttonStatus = sharedPreferences.getBoolean(MainActivity.BUTTON_STATUS, false);
     }
 }

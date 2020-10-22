@@ -207,7 +207,7 @@ public class CheckTime extends Service {
         timeFragment.t2Minute = sharedPreferences.getInt(TimeFragment.T2MINUTE, 0);
         vibratorSwitched = sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false);
         muteSoundSwitched = sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false);
-        screenFlashSwitched = sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH, false);
+        screenFlashSwitched = sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH_SWITCH, false);
     }
 
     private void activeBehaviour() {
