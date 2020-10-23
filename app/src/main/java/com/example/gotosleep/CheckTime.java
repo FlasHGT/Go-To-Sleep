@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
@@ -18,6 +19,7 @@ import android.view.Display;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.gotosleep.ui.main.TimeFragment;
 
@@ -320,7 +322,8 @@ public class CheckTime extends Service {
         startForeground(NOTIF_ID, new NotificationCompat.Builder(this,
                 NOTIF_CHANNEL_ID) // don't forget create a notification channel first
                 .setOngoing(true)
-                .setSmallIcon(R.drawable.ic_transparent)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setColor(ContextCompat.getColor(this, R.color.black))
                 .setContentText("Checking time")
                 .setContentIntent(pendingIntent)
                 .build());
@@ -328,7 +331,7 @@ public class CheckTime extends Service {
 
     private void createNotificationChannel () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Registering time";
+            CharSequence name = "Check time";
             int importance = NotificationManager.IMPORTANCE_MIN;
             NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID, name, importance);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);

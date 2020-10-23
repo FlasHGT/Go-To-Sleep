@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,8 +50,11 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick (View view) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    ScreenFlashDialog screenFlashDialog = new ScreenFlashDialog();
-                    screenFlashDialog.show(getFragmentManager(), "info dialog");
+                    if (!Settings.System.canWrite(getContext()) && MainActivity.screenFlash.isChecked()) {
+                        // isChecked gets changed onclick, so if the switch is on and it gets pressed, isChecked outputs false
+                        ScreenFlashDialog screenFlashDialog = new ScreenFlashDialog();
+                        screenFlashDialog.show(getFragmentManager(), "info dialog");
+                    }
                 }
 
                 saveData();
