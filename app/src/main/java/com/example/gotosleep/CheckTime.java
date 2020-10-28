@@ -126,18 +126,18 @@ public class CheckTime extends Service {
 
                 display = getDisplay();
 
+                try {
+                    startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                } catch (Settings.SettingNotFoundException e) {
+                    e.printStackTrace();
+                }
+
                 if (checkTimeInRange()) {
                     if (muteSoundSwitched) {
                         muteAllSound(true);
                     }
 
                     if (display.getState() == Display.STATE_ON) { // 1 - screen off, 2 - screen on
-                        try {
-                            startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-                        } catch (Settings.SettingNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
                         activeBehaviour();
                     }
 
@@ -232,8 +232,12 @@ public class CheckTime extends Service {
                             return;
                         }
 
-                        if (MainActivity.stopExecution) {
-                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                        try {
+                            if (MainActivity.stopExecution && startBrightness == Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
+                                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                            }
+                        } catch (Settings.SettingNotFoundException e) {
+                            e.printStackTrace();
                         }
 
                         if (muteSoundSwitched) {
