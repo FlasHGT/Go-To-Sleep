@@ -303,9 +303,9 @@ public class CheckTime extends Service {
         loadData();
 
         if ((timeFragment.t1Hour <= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
-                && timeFragment.t2Hour >= currentHour
+                && (timeFragment.t2Hour >= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
                 && (timeFragment.t1Minute <= currentMin || (timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour))
-                && (timeFragment.t2Minute >= currentMin || timeFragment.t2Hour > currentHour))
+                && (timeFragment.t2Minute >= currentMin || timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour))
         {
             return true;
         }else {
