@@ -53,11 +53,11 @@ public class TimeFragment extends Fragment
 
                                 calendar.set(0, 0, 0, t1Hour, t1Minute);
 
-                                startTime.setText(DateFormat.format("hh:mm aa", calendar));
+                                startTime.setText(DateFormat.format("HH:mm", calendar));
 
                                 saveData();
                             }
-                        }, 12, 0, false
+                        }, 24, 0, true
                 );
 
                 timePickerDialog.updateTime(t1Hour, t1Minute);
@@ -80,11 +80,11 @@ public class TimeFragment extends Fragment
 
                                 calendar.set(0, 0, 0, t2Hour, t2Minute);
 
-                                endTime.setText(DateFormat.format("hh:mm aa", calendar));
+                                endTime.setText(DateFormat.format("HH:mm", calendar));
 
                                 saveData();
                             }
-                        }, 12, 0, false
+                        }, 24, 0, true
                 );
 
                 timePickerDialog.updateTime(t2Hour, t2Minute);
@@ -124,41 +124,14 @@ public class TimeFragment extends Fragment
         t2Hour = sharedPreferences.getInt(T2HOUR, 6);
         t2Minute = sharedPreferences.getInt(T2MINUTE, 0);
 
-        startTime.setText(formatTimeString(t1Hour, t1Minute));
-        endTime.setText(formatTimeString(t2Hour, t2Minute));
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(0, 0, 0, t1Hour, t1Minute);
+        startTime.setText(DateFormat.format("HH:mm", calendar));
+
+        calendar.set(0, 0, 0, t2Hour, t2Minute);
+        endTime.setText(DateFormat.format("HH:mm", calendar));
     }
 
-    public String formatTimeString (int hour, int minute) {
-        String output = "";
 
-        String timeOfDay = "";
-
-        if (hour > 12) {
-            hour = hour - 12;
-
-            timeOfDay = "PM";
-        }else {
-            timeOfDay = "AM";
-
-            if (hour == 0) {
-                hour = 12;
-            }
-        }
-
-        if (hour < 10) {
-            output += "0" + hour + ":";
-        }else {
-            output += hour + ":";
-        }
-
-        if (minute < 10) {
-            output += "0" + minute;
-        }else {
-            output += minute;
-        }
-
-        output += " " + timeOfDay;
-
-        return output;
-    }
 }

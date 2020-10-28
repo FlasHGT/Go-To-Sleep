@@ -117,7 +117,7 @@ public class CheckTime extends Service {
                     currentHour = OffsetDateTime.now().getHour();
                     currentMin = OffsetDateTime.now().getMinute();
                 }else {
-                    String currentTime = new SimpleDateFormat("hh:mm", Locale.getDefault()).format(new Date());
+                    String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
                     String[] separated = currentTime.split(":");
 
                     currentHour = Integer.parseInt(separated[0]);
@@ -144,6 +144,10 @@ public class CheckTime extends Service {
                 }else {
                     if (muteSoundSwitched) {
                         muteAllSound(false);
+                    }
+
+                    if (screenFlashSwitched) {
+                        android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
                     }
                 }
 
@@ -173,7 +177,7 @@ public class CheckTime extends Service {
                     currentHour = OffsetDateTime.now().getHour();
                     currentMin = OffsetDateTime.now().getMinute();
                 }else {
-                    String currentTime = new SimpleDateFormat("hh:mm", Locale.getDefault()).format(new Date());
+                    String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
                     String[] separated = currentTime.split(":");
 
                     currentHour = Integer.parseInt(separated[0]);
@@ -191,6 +195,10 @@ public class CheckTime extends Service {
                 }else {
                     if (muteSoundSwitched) {
                         muteAllSound(false);
+                    }
+
+                    if (screenFlashSwitched) {
+                        android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
                     }
                 }
 
@@ -305,7 +313,7 @@ public class CheckTime extends Service {
         if ((timeFragment.t1Hour <= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
                 && (timeFragment.t2Hour >= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
                 && (timeFragment.t1Minute <= currentMin || (timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour))
-                && (timeFragment.t2Minute >= currentMin || timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour))
+                && (timeFragment.t2Minute >= currentMin || (timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour)))
         {
             return true;
         }else {
