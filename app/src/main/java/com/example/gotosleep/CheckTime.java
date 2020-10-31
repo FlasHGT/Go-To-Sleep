@@ -89,6 +89,10 @@ public class CheckTime extends Service {
                     MainActivity.controlValue--;
                     scheduledFuture.cancel(true);
 
+                    if (activeFuture != null) {
+                        activeFuture.cancel(true);
+                    }
+
                     if (muteSoundSwitched) {
                         muteAllSound(false);
                     }
@@ -101,6 +105,11 @@ public class CheckTime extends Service {
                 if (MainActivity.controlValue > 1) {
                     MainActivity.controlValue--;
                     scheduledFuture.cancel(true);
+
+                    if (activeFuture != null) {
+                        activeFuture.cancel(true);
+                    }
+
                     return;
                 }
                 else if (MainActivity.controlValue == 1) {
@@ -169,6 +178,11 @@ public class CheckTime extends Service {
             public void run() {
                 if (MainActivity.stopExecution) {
                     scheduledFuture.cancel(true);
+
+                    if (activeFuture != null) {
+                        activeFuture.cancel(true);
+                    }
+
                     MainActivity.controlValue = 0;
                     return;
                 }
