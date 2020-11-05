@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
@@ -27,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -45,9 +45,6 @@ public class CheckTime extends Service {
     private int startBrightness = 0;
 
     private int secondsToDelay = 0;
-
-    private int currentHour = 0;
-    private int currentMin = 0;
 
     private Vibrator vibrator;
     private AudioManager audioManager;
@@ -74,6 +71,8 @@ public class CheckTime extends Service {
             String currentSeconds = new SimpleDateFormat("ss", Locale.getDefault()).format(new Date());
             secondsToDelay = 60 - Integer.parseInt(currentSeconds);
         }
+
+        //generateTests();
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -120,17 +119,6 @@ public class CheckTime extends Service {
 
                 if (MainActivity.controlValue == 0) {
                     MainActivity.controlValue++;
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    currentHour = OffsetDateTime.now().getHour();
-                    currentMin = OffsetDateTime.now().getMinute();
-                }else {
-                    String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                    String[] separated = currentTime.split(":");
-
-                    currentHour = Integer.parseInt(separated[0]);
-                    currentMin = Integer.parseInt(separated[1]);
                 }
 
                 display = getDisplay();
@@ -185,17 +173,6 @@ public class CheckTime extends Service {
 
                     MainActivity.controlValue = 0;
                     return;
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    currentHour = OffsetDateTime.now().getHour();
-                    currentMin = OffsetDateTime.now().getMinute();
-                }else {
-                    String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                    String[] separated = currentTime.split(":");
-
-                    currentHour = Integer.parseInt(separated[0]);
-                    currentMin = Integer.parseInt(separated[1]);
                 }
 
                 if (checkTimeInRange()) {
@@ -325,13 +302,55 @@ public class CheckTime extends Service {
 
     }
 
+    private void generateTests () {
+        int min = 0;
+        int hourMax = 23;
+        int minuteMax = 59;
+
+        for (int i = 0; i < 100; i++) {
+            checkTimeInRangeTest(
+                    new Random().nextInt((hourMax - min) + 1) + min,
+                    new Random().nextInt((minuteMax - min) + 1) + min,
+                    new Random().nextInt((hourMax - min) + 1) + min,
+                    new Random().nextInt((minuteMax - min) + 1) + min,
+                    new Random().nextInt((hourMax - min) + 1) + min,
+                    new Random().nextInt((minuteMax - min) + 1) + min);
+        }
+    }
+
+    private void checkTimeInRangeTest (int t1Hour, int t1Minute, int t2Hour, int t2Minute, int testCurrentHour, int testCurrentMin) {
+        if ((t1Hour <= testCurrentHour || t2Hour >= testCurrentHour && t1Hour > t2Hour || t1Hour == t2Hour)
+                && (t2Hour >= testCurrentHour || t2Hour < t1Hour || t1Hour == t2Hour)
+                && (t1Minute <= testCurrentMin && t1Hour != t2Hour || t1Hour < testCurrentHour || t2Hour < t1Hour && t1Hour != testCurrentHour || t1Hour == t2Hour && testCurrentHour == t1Hour && t2Minute > testCurrentMin || t1Hour == t2Hour && testCurrentHour != t1Hour && t2Minute < t1Minute)
+                && (t2Minute >= testCurrentMin && t1Hour != t2Hour || t2Hour > testCurrentHour || t2Hour < t1Hour && t2Hour != testCurrentHour || t1Hour == t2Hour && testCurrentHour == t1Hour && t1Minute < testCurrentMin || t1Hour == t2Hour && testCurrentHour != t1Hour && t2Minute < t1Minute))
+        {
+            Log.d("test", t1Hour + ":" + t1Minute + " " + testCurrentHour + ":" + testCurrentMin + " " + t2Hour + ":" + t2Minute + "    TRUE");
+        }else {
+            Log.d("test", t1Hour + ":" + t1Minute + " " + testCurrentHour + ":" + testCurrentMin + " " + t2Hour + ":" + t2Minute + "    FALSE");
+        }
+    }
+
     private boolean checkTimeInRange () {
         loadData();
 
-        if ((timeFragment.t1Hour <= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
-                && (timeFragment.t2Hour >= currentHour || timeFragment.t2Hour < timeFragment.t1Hour)
-                && (timeFragment.t1Minute <= currentMin || (timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour))
-                && (timeFragment.t2Minute >= currentMin || (timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour)))
+        int currentHour;
+        int currentMin;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            currentHour = OffsetDateTime.now().getHour();
+            currentMin = OffsetDateTime.now().getMinute();
+        }else {
+            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+            String[] separated = currentTime.split(":");
+
+            currentHour = Integer.parseInt(separated[0]);
+            currentMin = Integer.parseInt(separated[1]);
+        }
+
+        if ((timeFragment.t1Hour <= currentHour || timeFragment.t2Hour >= currentHour && timeFragment.t1Hour > timeFragment.t2Hour || timeFragment.t1Hour == timeFragment.t2Hour)
+                && (timeFragment.t2Hour >= currentHour || timeFragment.t2Hour < timeFragment.t1Hour || timeFragment.t1Hour == timeFragment.t2Hour)
+                && (timeFragment.t1Minute <= currentMin && timeFragment.t1Hour != timeFragment.t2Hour || timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour && timeFragment.t1Hour != currentHour || timeFragment.t1Hour == timeFragment.t2Hour && currentHour == timeFragment.t1Hour && timeFragment.t2Minute > currentMin || timeFragment.t1Hour == timeFragment.t2Hour && currentHour != timeFragment.t1Hour && timeFragment.t2Minute < timeFragment.t1Minute)
+                && (timeFragment.t2Minute >= currentMin && timeFragment.t1Hour != timeFragment.t2Hour || timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour && timeFragment.t2Hour != currentHour || timeFragment.t1Hour == timeFragment.t2Hour && currentHour == timeFragment.t1Hour && timeFragment.t1Minute < currentMin || timeFragment.t1Hour == timeFragment.t2Hour && currentHour != timeFragment.t1Hour && timeFragment.t2Minute < timeFragment.t1Minute))
         {
             return true;
         }else {
