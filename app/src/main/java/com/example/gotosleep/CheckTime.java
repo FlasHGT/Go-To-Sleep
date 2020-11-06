@@ -42,7 +42,8 @@ public class CheckTime extends Service {
     private Display display;
 
     private int brightness = 0;
-    private int startBrightness = 0;
+    private static int startBrightness = 0;
+    private static boolean adaptiveBrightnessWasOn = false;
 
     private int secondsToDelay = 0;
 
@@ -123,20 +124,29 @@ public class CheckTime extends Service {
 
                 display = getDisplay();
 
-                try {
-                    startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-                } catch (Settings.SettingNotFoundException e) {
-                    e.printStackTrace();
+                if (screenFlashSwitched) {
+                    try {
+                        startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                    } catch (Settings.SettingNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (checkTimeInRange()) {
+                    try {
+                        if (screenFlashSwitched && Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == 1) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                            adaptiveBrightnessWasOn = true;
+                        }
+                    } catch (Settings.SettingNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     if (muteSoundSwitched) {
                         muteAllSound(true);
                     }
 
-                    if (display.getState() == Display.STATE_ON) { // 1 - screen off, 2 - screen on
-                        activeBehaviour();
-                    }
+                    activeBehaviour();
 
                 }else {
                     if (muteSoundSwitched) {
@@ -144,6 +154,11 @@ public class CheckTime extends Service {
                     }
 
                     if (screenFlashSwitched) {
+                        if (adaptiveBrightnessWasOn) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                            adaptiveBrightnessWasOn = false;
+                        }
+
                         android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
                     }
                 }
@@ -176,19 +191,39 @@ public class CheckTime extends Service {
                 }
 
                 if (checkTimeInRange()) {
+                    try {
+                        if (screenFlashSwitched && Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == 1) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                            adaptiveBrightnessWasOn = true;
+                        }
+                    } catch (Settings.SettingNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     if (muteSoundSwitched) {
                         muteAllSound(true);
                     }
 
-                    if (display.getState() == Display.STATE_ON) { // 1 - screen off, 2 - screen on
-                        activeBehaviour();
-                    }
+                    activeBehaviour();
                 }else {
+                    try {
+                        if (startBrightness != Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
+                            startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                        }
+                    } catch (Settings.SettingNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     if (muteSoundSwitched) {
                         muteAllSound(false);
                     }
 
                     if (screenFlashSwitched) {
+                        if (adaptiveBrightnessWasOn) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                            adaptiveBrightnessWasOn = false;
+                        }
+
                         android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
                     }
                 }
@@ -224,8 +259,15 @@ public class CheckTime extends Service {
                         }
 
                         try {
-                            if (MainActivity.stopExecution && startBrightness == Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
-                                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                            if (MainActivity.stopExecution && screenFlashSwitched) {
+                                if (Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == 0 && adaptiveBrightnessWasOn) {
+                                    android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                                    adaptiveBrightnessWasOn = false;
+                                }
+
+                                if (startBrightness == Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
+                                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                                }
                             }
                         } catch (Settings.SettingNotFoundException e) {
                             e.printStackTrace();
@@ -321,8 +363,10 @@ public class CheckTime extends Service {
     private void checkTimeInRangeTest (int t1Hour, int t1Minute, int t2Hour, int t2Minute, int testCurrentHour, int testCurrentMin) {
         if ((t1Hour <= testCurrentHour || t2Hour >= testCurrentHour && t1Hour > t2Hour || t1Hour == t2Hour)
                 && (t2Hour >= testCurrentHour || t2Hour < t1Hour || t1Hour == t2Hour)
-                && (t1Minute <= testCurrentMin && t1Hour != t2Hour || t1Hour < testCurrentHour || t2Hour < t1Hour && t1Hour != testCurrentHour || t1Hour == t2Hour && testCurrentHour == t1Hour && t2Minute > testCurrentMin || t1Hour == t2Hour && testCurrentHour != t1Hour && t2Minute < t1Minute)
-                && (t2Minute >= testCurrentMin && t1Hour != t2Hour || t2Hour > testCurrentHour || t2Hour < t1Hour && t2Hour != testCurrentHour || t1Hour == t2Hour && testCurrentHour == t1Hour && t1Minute < testCurrentMin || t1Hour == t2Hour && testCurrentHour != t1Hour && t2Minute < t1Minute))
+                && (t1Minute <= testCurrentMin && t1Hour != t2Hour || t1Hour < testCurrentHour || t2Hour < t1Hour && t1Hour != testCurrentHour
+                    || t1Hour == t2Hour && testCurrentHour == t1Hour && t2Minute > testCurrentMin || t1Hour == t2Hour && testCurrentHour != t1Hour && t2Minute < t1Minute)
+                && (t2Minute >= testCurrentMin && t1Hour != t2Hour || t2Hour > testCurrentHour || t2Hour < t1Hour && t2Hour != testCurrentHour
+                    || t1Hour == t2Hour && testCurrentHour == t1Hour && t1Minute < testCurrentMin || t1Hour == t2Hour && testCurrentHour != t1Hour && t2Minute < t1Minute))
         {
             Log.d("test", t1Hour + ":" + t1Minute + " " + testCurrentHour + ":" + testCurrentMin + " " + t2Hour + ":" + t2Minute + "    TRUE");
         }else {
@@ -349,8 +393,12 @@ public class CheckTime extends Service {
 
         if ((timeFragment.t1Hour <= currentHour || timeFragment.t2Hour >= currentHour && timeFragment.t1Hour > timeFragment.t2Hour || timeFragment.t1Hour == timeFragment.t2Hour)
                 && (timeFragment.t2Hour >= currentHour || timeFragment.t2Hour < timeFragment.t1Hour || timeFragment.t1Hour == timeFragment.t2Hour)
-                && (timeFragment.t1Minute <= currentMin && timeFragment.t1Hour != timeFragment.t2Hour || timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour && timeFragment.t1Hour != currentHour || timeFragment.t1Hour == timeFragment.t2Hour && currentHour == timeFragment.t1Hour && timeFragment.t2Minute > currentMin || timeFragment.t1Hour == timeFragment.t2Hour && currentHour != timeFragment.t1Hour && timeFragment.t2Minute < timeFragment.t1Minute)
-                && (timeFragment.t2Minute >= currentMin && timeFragment.t1Hour != timeFragment.t2Hour || timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour && timeFragment.t2Hour != currentHour || timeFragment.t1Hour == timeFragment.t2Hour && currentHour == timeFragment.t1Hour && timeFragment.t1Minute < currentMin || timeFragment.t1Hour == timeFragment.t2Hour && currentHour != timeFragment.t1Hour && timeFragment.t2Minute < timeFragment.t1Minute))
+                && (timeFragment.t1Minute <= currentMin && timeFragment.t1Hour != timeFragment.t2Hour || timeFragment.t1Hour < currentHour || timeFragment.t2Hour < timeFragment.t1Hour && timeFragment.t1Hour != currentHour
+                    || timeFragment.t1Hour == timeFragment.t2Hour && currentHour == timeFragment.t1Hour && timeFragment.t2Minute >= currentMin
+                    || timeFragment.t1Hour == timeFragment.t2Hour && currentHour != timeFragment.t1Hour && timeFragment.t2Minute < timeFragment.t1Minute)
+                && (timeFragment.t2Minute >= currentMin && timeFragment.t1Hour != timeFragment.t2Hour || timeFragment.t2Hour > currentHour || timeFragment.t2Hour < timeFragment.t1Hour && timeFragment.t2Hour != currentHour
+                    || timeFragment.t1Hour == timeFragment.t2Hour && currentHour == timeFragment.t1Hour && timeFragment.t1Minute <= currentMin
+                    || timeFragment.t1Hour == timeFragment.t2Hour && currentHour != timeFragment.t1Hour && timeFragment.t2Minute < timeFragment.t1Minute))
         {
             return true;
         }else {
