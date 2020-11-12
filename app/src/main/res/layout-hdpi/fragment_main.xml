@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/description3" />
 
     <TextView
-        android:id="@+id/startTime2"
+        android:id="@+id/startTime"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/text_view_bottom_border"
@@ -66,10 +66,10 @@
         app:layout_constraintEnd_toEndOf="@+id/description3"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="@+id/description3"
-        app:layout_constraintTop_toBottomOf="@+id/startTime2" />
+        app:layout_constraintTop_toBottomOf="@+id/startTime" />
 
     <TextView
-        android:id="@+id/endTime2"
+        android:id="@+id/endTime"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/text_view_bottom_border"

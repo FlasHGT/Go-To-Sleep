@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.PresetFragment">
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="96dp"
+        android:gravity="center"
+        android:text="PRESETS ALLOW FOR MULTIPLE TIME AND SETTING CONFIGURATIONS"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/preset1"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:srcCompat="@drawable/ic_baseline_filter_1_24" />
+
+    <ImageView
+        android:id="@+id/preset2"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/preset1"
+        app:layout_constraintStart_toStartOf="@+id/preset1"
+        app:layout_constraintTop_toBottomOf="@+id/preset1"
+        app:srcCompat="@drawable/ic_baseline_filter_2_24" />
+
+    <ImageView
+        android:id="@+id/preset3"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/preset2"
+        app:layout_constraintStart_toStartOf="@+id/preset2"
+        app:layout_constraintTop_toBottomOf="@+id/preset2"
+        app:srcCompat="@drawable/ic_baseline_filter_3_24" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

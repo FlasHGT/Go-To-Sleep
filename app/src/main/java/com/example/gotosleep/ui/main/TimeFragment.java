@@ -35,8 +35,8 @@ public class TimeFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        startTime = view.findViewById(R.id.startTime2);
-        endTime = view.findViewById(R.id.endTime2);
+        startTime = view.findViewById(R.id.startTime);
+        endTime = view.findViewById(R.id.endTime);
 
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +132,4 @@ public class TimeFragment extends Fragment
         calendar.set(0, 0, 0, t2Hour, t2Minute);
         endTime.setText(DateFormat.format("HH:mm", calendar));
     }
-
-
 }

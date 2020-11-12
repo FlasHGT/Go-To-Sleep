@@ -24,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String BUTTON_STATUS = "buttonStatus";
+    public static final String ACTIVE_PRESET ="activePreset";
+
+    public int currentActivePreset = 1;
 
     public static int controlValue = 0; // (controlValue <= 1) no tasks running or one task running, (controlValue > 1) too many tasks are running, destroy instances until there is only one left.
     public static boolean stopExecution = false;
@@ -57,11 +60,6 @@ public class MainActivity extends AppCompatActivity {
         mainButton = findViewById(R.id.mainButton);
 
         loadData();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override
