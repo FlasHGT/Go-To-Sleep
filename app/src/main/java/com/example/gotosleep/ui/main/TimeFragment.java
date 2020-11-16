@@ -2,9 +2,11 @@ package com.example.gotosleep.ui.main;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +24,29 @@ import java.util.Calendar;
 
 public class TimeFragment extends Fragment
 {
-    public static final String T1HOUR = "t1Hour";
-    public static final String T1MINUTE = "t1Minute";
-    public static final String T2HOUR = "t2Hour";
-    public static final String T2MINUTE = "t2Minute";
+    public static final String T1HOUR_1 = "t1Hour1";
+    public static final String T1MINUTE_1 = "t1Minute1";
+    public static final String T2HOUR_1 = "t2Hour1";
+    public static final String T2MINUTE_1 = "t2Minute1";
 
-    public TextView startTime, endTime;
+    public static final String T1HOUR_2 = "t1Hour2";
+    public static final String T1MINUTE_2 = "t1Minute2";
+    public static final String T2HOUR_2 = "t2Hour2";
+    public static final String T2MINUTE_2 = "t2Minute2";
+
+    public static final String T1HOUR_3 = "t1Hour3";
+    public static final String T1MINUTE_3 = "t1Minute3";
+    public static final String T2HOUR_3 = "t2Hour3";
+    public static final String T2MINUTE_3 = "t2Minute3";
+
+    public String t1HourTemp = "T1HOUR_";
+    public String t1MinTemp = "T1MINUTE_";
+    public String t2HourTemp = "T2HOUR_";
+    public String t2MinTemp = "T2MINUTE_";
+
+    private int currentPreset = 1;
+
+    public static TextView startTime, endTime;
     public int t1Hour, t1Minute, t2Hour, t2Minute;
 
     @Nullable
@@ -108,10 +127,12 @@ public class TimeFragment extends Fragment
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putInt(T1HOUR, t1Hour);
-        editor.putInt(T1MINUTE, t1Minute);
-        editor.putInt(T2HOUR, t2Hour);
-        editor.putInt(T2MINUTE, t2Minute);
+        currentPreset = sharedPreferences.getInt(MainActivity.ACTIVE_PRESET, 1);
+
+        editor.putInt(t1HourTemp + currentPreset, t1Hour);
+        editor.putInt(t1MinTemp + currentPreset, t1Minute);
+        editor.putInt(t2HourTemp + currentPreset, t2Hour);
+        editor.putInt(t2MinTemp + currentPreset, t2Minute);
 
         editor.apply();
     }
@@ -119,10 +140,12 @@ public class TimeFragment extends Fragment
     public void loadData() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
 
-        t1Hour = sharedPreferences.getInt(T1HOUR, 0);
-        t1Minute = sharedPreferences.getInt(T1MINUTE, 0);
-        t2Hour = sharedPreferences.getInt(T2HOUR, 6);
-        t2Minute = sharedPreferences.getInt(T2MINUTE, 0);
+        currentPreset = sharedPreferences.getInt(MainActivity.ACTIVE_PRESET, 1);
+
+        t1Hour = sharedPreferences.getInt(t1HourTemp + currentPreset, 0);
+        t1Minute = sharedPreferences.getInt(t1MinTemp + currentPreset, 0);
+        t2Hour = sharedPreferences.getInt(t2HourTemp + currentPreset, 6);
+        t2Minute = sharedPreferences.getInt(t2MinTemp + currentPreset, 0);
 
         Calendar calendar = Calendar.getInstance();
 

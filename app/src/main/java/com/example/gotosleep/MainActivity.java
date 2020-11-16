@@ -3,6 +3,8 @@ package com.example.gotosleep;
 import android.app.NotificationManager;
 import android.os.Bundle;
 
+import com.example.gotosleep.ui.main.PresetFragment;
+import com.example.gotosleep.ui.main.SettingsFragment;
 import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,13 +31,25 @@ public class MainActivity extends AppCompatActivity {
     public int currentActivePreset = 1;
 
     public static int controlValue = 0; // (controlValue <= 1) no tasks running or one task running, (controlValue > 1) too many tasks are running, destroy instances until there is only one left.
-    public static boolean stopExecution = false;
+    public static boolean stopExecution = true;
 
     public static Button mainButton;
 
-    public static final String VIBRATE_SWITCH = "vibrateSwitch";
-    public static final String MUTE_SOUND_SWITCH = "muteSoundSwitch";
-    public static final String SCREEN_FLASH_SWITCH = "screenFlashSwitch";
+    public static final String VIBRATE_SWITCH_1 = "vibrateSwitch1";
+    public static final String MUTE_SOUND_SWITCH_1 = "muteSoundSwitch1";
+    public static final String SCREEN_FLASH_SWITCH_1 = "screenFlashSwitch1";
+
+    public static final String VIBRATE_SWITCH_2 = "vibrateSwitch2";
+    public static final String MUTE_SOUND_SWITCH_2 = "muteSoundSwitch2";
+    public static final String SCREEN_FLASH_SWITCH_2 = "screenFlashSwitch2";
+
+    public static final String VIBRATE_SWITCH_3 = "vibrateSwitch3";
+    public static final String MUTE_SOUND_SWITCH_3 = "muteSoundSwitch3";
+    public static final String SCREEN_FLASH_SWITCH_3 = "screenFlashSwitch3";
+
+    public static String vibrateSwitchTemp = "VIBRATE_SWITCH_";
+    public static String muteSoundSwitchTemp = "MUTE_SOUND_SWITCH_";
+    public static String screenFlashSwitchTemp = "SCREEN_FLASH_SWITCH_";
 
     public static Switch muteSound, vibrate, screenFlash;
 
@@ -156,9 +170,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimeChecking () {
-        if (stopExecution) {
-            stopExecution = false;
-        }
+        stopExecution = false;
         startService(new Intent(this, CheckTime.class));
     }
 

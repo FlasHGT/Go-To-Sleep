@@ -81,9 +81,11 @@ public class SettingsFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putBoolean(MainActivity.MUTE_SOUND_SWITCH, MainActivity.muteSound.isChecked());
-        editor.putBoolean(MainActivity.VIBRATE_SWITCH, MainActivity.vibrate.isChecked());
-        editor.putBoolean(MainActivity.SCREEN_FLASH_SWITCH, MainActivity.screenFlash.isChecked());
+        mainActivity.currentActivePreset = sharedPreferences.getInt(MainActivity.ACTIVE_PRESET, 1);
+
+        editor.putBoolean(MainActivity.muteSoundSwitchTemp + mainActivity.currentActivePreset, MainActivity.muteSound.isChecked());
+        editor.putBoolean(MainActivity.vibrateSwitchTemp + mainActivity.currentActivePreset, MainActivity.vibrate.isChecked());
+        editor.putBoolean(MainActivity.screenFlashSwitchTemp + mainActivity.currentActivePreset, MainActivity.screenFlash.isChecked());
         editor.putBoolean(MainActivity.BUTTON_STATUS, mainActivity.buttonStatus);
 
         editor.apply();
@@ -92,9 +94,11 @@ public class SettingsFragment extends Fragment {
     public void loadData () {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
 
-        MainActivity.muteSound.setChecked(sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false));
-        MainActivity.vibrate.setChecked(sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false));
-        MainActivity.screenFlash.setChecked(sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH_SWITCH, false));
+        mainActivity.currentActivePreset = sharedPreferences.getInt(MainActivity.ACTIVE_PRESET, 1);
+
+        MainActivity.muteSound.setChecked(sharedPreferences.getBoolean(MainActivity.muteSoundSwitchTemp + mainActivity.currentActivePreset, false));
+        MainActivity.vibrate.setChecked(sharedPreferences.getBoolean(MainActivity.vibrateSwitchTemp + mainActivity.currentActivePreset, false));
+        MainActivity.screenFlash.setChecked(sharedPreferences.getBoolean(MainActivity.screenFlashSwitchTemp + mainActivity.currentActivePreset, false));
         mainActivity.buttonStatus = sharedPreferences.getBoolean(MainActivity.BUTTON_STATUS, false);
     }
 }

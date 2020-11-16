@@ -47,6 +47,8 @@ public class CheckTime extends Service {
 
     private int secondsToDelay = 0;
 
+    private int currentPreset = 1;
+
     private Vibrator vibrator;
     private AudioManager audioManager;
 
@@ -237,13 +239,15 @@ public class CheckTime extends Service {
     public void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SHARED_PREFS, MODE_PRIVATE);
 
-        timeFragment.t1Hour = sharedPreferences.getInt(TimeFragment.T1HOUR, 0);
-        timeFragment.t1Minute = sharedPreferences.getInt(TimeFragment.T1MINUTE, 0);
-        timeFragment.t2Hour = sharedPreferences.getInt(TimeFragment.T2HOUR, 6);
-        timeFragment.t2Minute = sharedPreferences.getInt(TimeFragment.T2MINUTE, 0);
-        vibratorSwitched = sharedPreferences.getBoolean(MainActivity.VIBRATE_SWITCH, false);
-        muteSoundSwitched = sharedPreferences.getBoolean(MainActivity.MUTE_SOUND_SWITCH, false);
-        screenFlashSwitched = sharedPreferences.getBoolean(MainActivity.SCREEN_FLASH_SWITCH, false);
+        currentPreset = sharedPreferences.getInt(MainActivity.ACTIVE_PRESET, 1);
+
+        timeFragment.t1Hour = sharedPreferences.getInt(timeFragment.t1HourTemp + currentPreset, 0);
+        timeFragment.t1Minute = sharedPreferences.getInt(timeFragment.t1MinTemp + currentPreset, 0);
+        timeFragment.t2Hour = sharedPreferences.getInt(timeFragment.t2HourTemp + currentPreset, 6);
+        timeFragment.t2Minute = sharedPreferences.getInt(timeFragment.t2MinTemp + currentPreset, 0);
+        vibratorSwitched = sharedPreferences.getBoolean(MainActivity.vibrateSwitchTemp + currentPreset, false);
+        muteSoundSwitched = sharedPreferences.getBoolean(MainActivity.muteSoundSwitchTemp + currentPreset, false);
+        screenFlashSwitched = sharedPreferences.getBoolean(MainActivity.screenFlashSwitchTemp + currentPreset, false);
     }
 
     private void activeBehaviour() {
