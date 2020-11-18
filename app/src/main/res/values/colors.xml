@@ -9,4 +9,5 @@
     <color name="dark_red">#8B0000</color>
     <color name="green">#008000</color>
     <color name="grey">#808080</color>
+    <color name="greenGrey">#001900</color>
 </resources>

@@ -42,7 +42,7 @@ public class CheckTime extends Service {
     private Display display;
 
     private int brightness = 0;
-    private static int startBrightness = 0;
+    private static int startBrightness = -1;
     private static boolean adaptiveBrightnessWasOn = false;
 
     private int secondsToDelay = 0;
@@ -161,7 +161,9 @@ public class CheckTime extends Service {
                             adaptiveBrightnessWasOn = false;
                         }
 
-                        android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                        if (startBrightness != -1) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                        }
                     }
                 }
 
@@ -226,7 +228,9 @@ public class CheckTime extends Service {
                             adaptiveBrightnessWasOn = false;
                         }
 
-                        android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                        if (startBrightness != -1) {
+                            android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                        }
                     }
                 }
 

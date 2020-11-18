@@ -1,20 +1,20 @@
 package com.example.gotosleep;
 
 import android.app.NotificationManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 
-import com.example.gotosleep.ui.main.PresetFragment;
-import com.example.gotosleep.ui.main.SettingsFragment;
 import com.google.android.material.tabs.TabLayout;
+
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.gotosleep.ui.main.SectionsPagerAdapter;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Switch;
 
 import java.util.concurrent.Executors;
@@ -53,15 +53,21 @@ public class MainActivity extends AppCompatActivity {
 
     public static Switch muteSound, vibrate, screenFlash;
 
+    public static ImageView preset1, preset2, preset3;
+
     public boolean buttonStatus = false;
 
     private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> notificationFuture;
 
+    private Resources resources;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        resources = getResources();
 
         checkIfNotificationIsRunning();
 
@@ -84,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void mainButtonBehaviour (View view) {
+        if (view != null) {
+            SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+            currentActivePreset = sharedPreferences.getInt(ACTIVE_PRESET, 1);
+        }
+
         if (buttonStatus) {
             if (view != null) {
                 mainButton.setText("TURN ON");
@@ -91,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 buttonStatus = false;
 
                 enableSwitches();
+                enablePresetButtons();
 
                 stopTimeChecking();
             }
@@ -99,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setBackgroundResource(R.drawable.roundedbuttongreen);
 
                 disableSwitches();
+                disablePresetButtons();
             }
         }
         else {
@@ -108,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 buttonStatus = true;
 
                 disableSwitches();
+                disablePresetButtons();
 
                 startTimeChecking();
             }
@@ -116,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 mainButton.setBackgroundResource(R.drawable.roundedbuttonred);
 
                 enableSwitches();
+                enablePresetButtons();
             }
         }
 
@@ -135,6 +150,50 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 
         buttonStatus = sharedPreferences.getBoolean(BUTTON_STATUS, false);
+    }
+
+    private void disablePresetButtons () {
+        if(preset1 != null && resources != null) {
+            switch (currentActivePreset) {
+                case 1:
+                    preset1.setColorFilter(resources.getColor(R.color.greenGrey));
+                    preset2.setColorFilter(resources.getColor(R.color.grey));
+                    preset3.setColorFilter(resources.getColor(R.color.grey));
+                    break;
+                case 2:
+                    preset2.setColorFilter(resources.getColor(R.color.greenGrey));
+                    preset1.setColorFilter(resources.getColor(R.color.grey));
+                    preset3.setColorFilter(resources.getColor(R.color.grey));
+                    break;
+                case 3:
+                    preset3.setColorFilter(resources.getColor(R.color.greenGrey));
+                    preset1.setColorFilter(resources.getColor(R.color.grey));
+                    preset2.setColorFilter(resources.getColor(R.color.grey));
+                    break;
+            }
+        }
+    }
+
+    private void enablePresetButtons () {
+        if (preset1 != null && resources != null) {
+            switch (currentActivePreset) {
+                case 1:
+                    preset1.setColorFilter(resources.getColor(R.color.green));
+                    preset2.setColorFilter(resources.getColor(R.color.white));
+                    preset3.setColorFilter(resources.getColor(R.color.white));
+                    break;
+                case 2:
+                    preset2.setColorFilter(resources.getColor(R.color.green));
+                    preset1.setColorFilter(resources.getColor(R.color.white));
+                    preset3.setColorFilter(resources.getColor(R.color.white));
+                    break;
+                case 3:
+                    preset3.setColorFilter(resources.getColor(R.color.green));
+                    preset1.setColorFilter(resources.getColor(R.color.white));
+                    preset2.setColorFilter(resources.getColor(R.color.white));
+                    break;
+            }
+        }
     }
 
     private void enableSwitches () {
