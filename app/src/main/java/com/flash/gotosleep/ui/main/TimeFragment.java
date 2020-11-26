@@ -1,11 +1,10 @@
-package com.example.gotosleep.ui.main;
+package com.flash.gotosleep.ui.main;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.gotosleep.MainActivity;
-import com.example.gotosleep.R;
+import com.flash.gotosleep.MainActivity;
+import com.flash.gotosleep.R;
 
 import java.util.Calendar;
 

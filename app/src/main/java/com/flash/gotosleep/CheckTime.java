@@ -1,4 +1,4 @@
-package com.example.gotosleep;
+package com.flash.gotosleep;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -20,7 +20,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.gotosleep.ui.main.TimeFragment;
+import com.flash.gotosleep.ui.main.TimeFragment;
 
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
@@ -42,8 +42,11 @@ public class CheckTime extends Service {
     private Display display;
 
     private int brightness = 0;
-    private static int startBrightness = -1;
-    private static boolean adaptiveBrightnessWasOn = false;
+    private int startBrightness = -1;
+    private boolean adaptiveBrightnessWasOn = false;
+
+    public static final String ADAPTIVE_BRIGHTNESS = "adaptiveBrightness";
+    public static final String START_BRIGHTNESS = "startBrightness";
 
     private int secondsToDelay = 0;
 
@@ -124,11 +127,14 @@ public class CheckTime extends Service {
                     MainActivity.controlValue++;
                 }
 
+                loadData();
+
                 display = getDisplay();
 
                 if (screenFlashSwitched) {
                     try {
                         startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+                        saveBrightnessData();
                     } catch (Settings.SettingNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -139,6 +145,7 @@ public class CheckTime extends Service {
                         if (screenFlashSwitched && Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == 1) {
                             android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
                             adaptiveBrightnessWasOn = true;
+                            saveBrightnessData();
                         }
                     } catch (Settings.SettingNotFoundException e) {
                         e.printStackTrace();
@@ -151,6 +158,8 @@ public class CheckTime extends Service {
                     activeBehaviour();
 
                 }else {
+                    loadBrightnessData();
+
                     if (muteSoundSwitched) {
                         muteAllSound(false);
                     }
@@ -159,6 +168,7 @@ public class CheckTime extends Service {
                         if (adaptiveBrightnessWasOn) {
                             android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
                             adaptiveBrightnessWasOn = false;
+                            saveBrightnessData();
                         }
 
                         if (startBrightness != -1) {
@@ -199,6 +209,7 @@ public class CheckTime extends Service {
                         if (screenFlashSwitched && Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == 1) {
                             android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
                             adaptiveBrightnessWasOn = true;
+                            saveBrightnessData();
                         }
                     } catch (Settings.SettingNotFoundException e) {
                         e.printStackTrace();
@@ -210,8 +221,13 @@ public class CheckTime extends Service {
 
                     activeBehaviour();
                 }else {
+                    loadBrightnessData();
+
                     try {
-                        if (startBrightness != Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
+                        if (startBrightness != Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)
+                                && (Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) != 255
+                                && Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) != 0)
+                        ) {
                             startBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
                         }
                     } catch (Settings.SettingNotFoundException e) {
@@ -226,6 +242,7 @@ public class CheckTime extends Service {
                         if (adaptiveBrightnessWasOn) {
                             android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
                             adaptiveBrightnessWasOn = false;
+                            saveBrightnessData();
                         }
 
                         if (startBrightness != -1) {
@@ -240,7 +257,7 @@ public class CheckTime extends Service {
         }, 0, secondsToDelay, TimeUnit.SECONDS);
     }
 
-    public void loadData () {
+    private void loadData () {
         SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SHARED_PREFS, MODE_PRIVATE);
 
         currentPreset = sharedPreferences.getInt(MainActivity.ACTIVE_PRESET, 1);
@@ -252,6 +269,23 @@ public class CheckTime extends Service {
         vibratorSwitched = sharedPreferences.getBoolean(MainActivity.vibrateSwitchTemp + currentPreset, false);
         muteSoundSwitched = sharedPreferences.getBoolean(MainActivity.muteSoundSwitchTemp + currentPreset, false);
         screenFlashSwitched = sharedPreferences.getBoolean(MainActivity.screenFlashSwitchTemp + currentPreset, false);
+    }
+
+    private void loadBrightnessData () {
+        SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SHARED_PREFS, MODE_PRIVATE);
+
+        startBrightness = sharedPreferences.getInt(START_BRIGHTNESS, -1);
+        adaptiveBrightnessWasOn = sharedPreferences.getBoolean(ADAPTIVE_BRIGHTNESS, false);
+    }
+
+    private void saveBrightnessData () {
+        SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean(ADAPTIVE_BRIGHTNESS, adaptiveBrightnessWasOn);
+        editor.putInt(START_BRIGHTNESS, startBrightness);
+
+        editor.apply();
     }
 
     private void activeBehaviour() {
@@ -268,13 +302,16 @@ public class CheckTime extends Service {
 
                         try {
                             if (MainActivity.stopExecution && screenFlashSwitched) {
+                                loadBrightnessData();
+
                                 if (Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == 0 && adaptiveBrightnessWasOn) {
                                     android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
                                     adaptiveBrightnessWasOn = false;
+                                    saveBrightnessData();
                                 }
 
-                                if (startBrightness == Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
-                                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
+                                if (startBrightness != Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)) {
+                                    android.provider.Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, startBrightness);
                                 }
                             }
                         } catch (Settings.SettingNotFoundException e) {

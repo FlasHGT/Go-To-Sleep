@@ -1,4 +1,4 @@
-package com.example.gotosleep.ui.main;
+package com.flash.gotosleep.ui.main;
 
 import android.content.Context;
 import androidx.annotation.Nullable;
@@ -6,7 +6,7 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import com.example.gotosleep.R;
+import com.flash.gotosleep.R;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to

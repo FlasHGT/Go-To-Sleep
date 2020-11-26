@@ -1,4 +1,4 @@
-package com.example.gotosleep.ui.main;
+package com.flash.gotosleep.ui.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.gotosleep.MainActivity;
-import com.example.gotosleep.R;
+import com.flash.gotosleep.MainActivity;
+import com.flash.gotosleep.R;
 
 import java.util.Calendar;
 

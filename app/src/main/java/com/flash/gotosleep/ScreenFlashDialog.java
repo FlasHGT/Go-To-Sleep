@@ -1,4 +1,4 @@
-package com.example.gotosleep;
+package com.flash.gotosleep;
 
 
 import android.app.AlertDialog;

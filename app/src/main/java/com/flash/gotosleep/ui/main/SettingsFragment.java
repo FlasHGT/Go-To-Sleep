@@ -1,4 +1,4 @@
-package com.example.gotosleep.ui.main;
+package com.flash.gotosleep.ui.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,14 +10,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.gotosleep.ScreenFlashDialog;
-import com.example.gotosleep.MainActivity;
-import com.example.gotosleep.R;
+import com.flash.gotosleep.ScreenFlashDialog;
+import com.flash.gotosleep.MainActivity;
+import com.flash.gotosleep.R;
 
 public class SettingsFragment extends Fragment {
 

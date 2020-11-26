@@ -1,4 +1,4 @@
-package com.example.gotosleep;
+package com.flash.gotosleep;
 
 import android.app.NotificationManager;
 import android.content.res.Resources;
@@ -8,7 +8,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.gotosleep.ui.main.SectionsPagerAdapter;
+import com.flash.gotosleep.ui.main.SectionsPagerAdapter;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
